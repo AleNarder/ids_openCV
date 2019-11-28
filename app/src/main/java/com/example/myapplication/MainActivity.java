@@ -12,6 +12,7 @@ import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 
 import java.util.ArrayList;
@@ -60,11 +61,11 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         Mat frame = inputFrame.rgba();
+        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2RGB);
         BallFinder ballFinder = new BallFinder(frame, true);
         ballFinder.setViewRatio(0.0f);
         // Bisogna lavorare un po' con i setter per trovare la configurazione adatta. Si trovano tutti dentro la classe BallFinder
-        ballFinder.setOrientation("portrait");
-        ballFinder.setMinArea(10);
+        ballFinder.setMinArea(30);
         ArrayList<Ball> f = ballFinder.findBalls();
 
         for (Ball b : f) {

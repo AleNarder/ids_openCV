@@ -81,10 +81,8 @@ public class BallFinder {
 
     public ArrayList<Ball> findBalls() {
         ArrayList<Ball> balls = new ArrayList<>();
-
         Mat hsv = new Mat();
         List <Mat> split_hsv = new ArrayList<>();
-
         Imgproc.cvtColor(frame, hsv, Imgproc.COLOR_RGB2HSV);
         Core.split(hsv, split_hsv);
 
