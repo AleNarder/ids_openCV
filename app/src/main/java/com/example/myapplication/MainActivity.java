@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
+import android.bluetooth.le.ScanRecord;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,7 +12,11 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.JavaCameraView;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 
@@ -24,12 +29,13 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
     private BaseLoaderCallback baseLoaderCallback;
 
     private final int MY_CAMERA_REQUEST_CODE=100;
-
+    private McLovinFinder finder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.finder = new McLovinFinder();
 
         if(checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
             requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_REQUEST_CODE);
@@ -46,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
                 super.onManagerConnected(status);
                 switch(status){
                     case BaseLoaderCallback.SUCCESS:
-
                         cameraBridgeViewBase.enableView();
                         break;
                     default:
@@ -60,27 +65,21 @@ public class MainActivity extends AppCompatActivity implements CameraBridgeViewB
 
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        Mat frame = inputFrame.rgba();
-        Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2RGB);
-        BallFinder ballFinder = new BallFinder(frame, true);
-        ballFinder.setViewRatio(0.0f);
-        // Bisogna lavorare un po' con i setter per trovare la configurazione adatta. Si trovano tutti dentro la classe BallFinder
-        ballFinder.setMinArea(30);
-        ArrayList<Ball> f = ballFinder.findBalls();
-
-        for (Ball b : f) {
-            Log.e("ball", String.valueOf(b.center.x));
-            Log.e("ball", String.valueOf(b.center.y));
-            Log.e("ball", String.valueOf(b.radius));
-            Log.e("ball", b.color);
-            Log.e("ball", "--------------------");
+        Mat input = inputFrame.rgba();
+        ArrayList<Ball>balls = this.finder.FindBalls(input);
+        this.finder.setDebug(true);
+        for(Ball ball : balls){
+            Log.e("[ Viewer ]", "----------------------");
+            Log.e("[ Viewer ]", "Center: "+ ball.center.toString() );
+            Log.e("[ Viewer ]", "Radius: "+ball.radius);
+            Log.e("[ Viewer ]", "Color: "+ball.color);
+            Log.e("[ Viewer ]", "----------------------");
         }
-        return frame;
+        return input;
     }
 
     @Override
     public void onCameraViewStarted(int width, int height) {
-
     }
 
     @Override

@@ -6,11 +6,28 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RLOWER+"
+        tools:layout_editor_absoluteX="3dp"
+        tools:layout_editor_absoluteY="626dp" />
+
     <org.opencv.android.JavaCameraView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="visible"
         android:id="@+id/CameraView"
-        />
+        android:layout_width="413dp"
+        android:layout_height="686dp"
+        android:visibility="visible"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-62dp" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="RLOWER-"
+        tools:layout_editor_absoluteX="3dp"
+        tools:layout_editor_absoluteY="674dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
