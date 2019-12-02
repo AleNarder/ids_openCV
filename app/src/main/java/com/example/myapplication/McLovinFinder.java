@@ -15,13 +15,13 @@ import java.util.List;
 public class McLovinFinder {
 
     private String[] colorNames = {"red", "blue", "yellow"};
-    private int[] red = {0, 16,145, 184};
+    private int[] red = {0, 18,145, 184};
     private int[] blue = {25, 32,105, 120};
     private int[] yellow = {20, 30, 20, 30};
     private int[][] colors = {red, blue, yellow};
     private Mat frame;
     private boolean debug;
-
+    private boolean ready;
     private int clock;
     private List<Integer> queue;
     private Iterator<Integer> it;
@@ -35,6 +35,7 @@ public class McLovinFinder {
         }
         this.it = queue.iterator();
         this.clock = this.it.next().intValue();
+        this.ready = false;
     }
 
     public void setDebug(boolean debug) {
@@ -64,19 +65,19 @@ public class McLovinFinder {
         }
     }
 
+
     public ArrayList<Ball> FindBalls(Mat frame){
         Mat hsv = new Mat();
         Mat lower = new Mat();
         Mat upper = new Mat();
-        Mat complete = new Mat();
         Mat circles = new Mat();
         ArrayList<Ball> balls = new ArrayList<>();
         Imgproc.cvtColor(frame, hsv, Imgproc.COLOR_BGR2HSV);
         Core.inRange(hsv, new Scalar(this.colors[this.clock][0], 100, 100), new Scalar(this.colors[this.clock][1], 255, 255), lower);
         Core.inRange(hsv, new Scalar(this.colors[this.clock][2], 100, 100), new Scalar(this.colors[this.clock][3], 255, 255), upper);
-        Core.addWeighted(lower, 1.0, upper, 1.0, 0.0, complete);
-        Imgproc.GaussianBlur(complete, complete,  new Size(7,7),3);
-        Imgproc.HoughCircles(complete, circles, Imgproc.CV_HOUGH_GRADIENT, 1, complete.rows()/8, 100, 20, 15,50);
+        Core.addWeighted(lower, 1.0, upper, 1.0, 0.0, frame);
+        Imgproc.GaussianBlur(frame, frame,  new Size(7,7),3);
+        Imgproc.HoughCircles(frame, circles, Imgproc.CV_HOUGH_GRADIENT, 1, frame.rows()/8, 100, 20, 15,50);
         if(circles.cols()==0){
             this.updateClock();
         }else{
@@ -94,7 +95,6 @@ public class McLovinFinder {
         }
         return balls;
     }
-
 }
 
 
