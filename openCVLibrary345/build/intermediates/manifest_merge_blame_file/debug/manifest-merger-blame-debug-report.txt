@@ -5,10 +5,10 @@
 5    android:versionName="3.4.5" >
 6
 7    <uses-sdk
-7-->C:\Users\depie\Desktop\unive\Ingegneria_Software\ids_openCV2\openCVLibrary345\src\main\AndroidManifest.xml:7:5-47
+7-->/home/alessio/StudioProjects/ids_openCV/openCVLibrary345/src/main/AndroidManifest.xml:7:5-47
 8        android:minSdkVersion="23"
-8-->C:\Users\depie\Desktop\unive\Ingegneria_Software\ids_openCV2\openCVLibrary345\src\main\AndroidManifest.xml:7:5-47
+8-->/home/alessio/StudioProjects/ids_openCV/openCVLibrary345/src/main/AndroidManifest.xml:7:5-47
 9        android:targetSdkVersion="29" />
-9-->C:\Users\depie\Desktop\unive\Ingegneria_Software\ids_openCV2\openCVLibrary345\src\main\AndroidManifest.xml:7:15-44
+9-->/home/alessio/StudioProjects/ids_openCV/openCVLibrary345/src/main/AndroidManifest.xml:7:15-44
 10
 11</manifest>
