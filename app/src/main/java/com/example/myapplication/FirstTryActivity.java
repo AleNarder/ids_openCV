@@ -34,11 +34,10 @@ public class FirstTryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_first_try);
         //EV3 ev3 =getIntent().getExtras().getSerializable("EV3MCLOVIN"); /**TODO**/
 
-       /** Button startButtonFirst= findViewById(R.id.startButtonFirst);
+       Button startButtonFirst= findViewById(R.id.startButtonFirst);
         Button stopButtonFirst = findViewById(R.id.stopButtonFirst);
         Button connectButton = findViewById(R.id.connect);
-        MANCANO I BOTTONI SU FILE XML
-        **/
+
 
         try {
             BluetoothConnection.BluetoothChannel ch = new BluetoothConnection("EV3MCLOVIN").connect(); // replace with your own brick name
@@ -48,8 +47,8 @@ public class FirstTryActivity extends AppCompatActivity {
             Log.e("FIRST TRY", "CANNOT connect to the fuckin lego");
         }
 
-        /**startButtonFirst.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::ev3Task2)));
-        stopButtonFirst.setOnClickListener(v->ev3.cancel());**/
+        startButtonFirst.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::ev3Task2)));
+        stopButtonFirst.setOnClickListener(v->ev3.cancel());
 
     }
 
