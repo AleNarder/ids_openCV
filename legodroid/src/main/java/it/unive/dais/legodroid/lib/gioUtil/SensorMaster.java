@@ -13,7 +13,6 @@ public class SensorMaster {
     private UltrasonicSensor ultra;
 
 
-    private SensorEventListener sensorListener;
 
     public SensorMaster(UltrasonicSensor ultra){
         this.ultra = ultra;

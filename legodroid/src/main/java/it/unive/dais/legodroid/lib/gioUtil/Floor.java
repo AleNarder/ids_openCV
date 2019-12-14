@@ -121,6 +121,9 @@ public class Floor {
         return prevPosition;
     }
     public OnFloorPosition getStartPosition(){return startPosition;}
+    public float getTileWidth(){return field[0][0].getWidth();}
+    public float getTileHeight(){return field[0][0].getHeight();}
+
     public int getWidth() {
         return width;
     }
@@ -288,7 +291,7 @@ public class Floor {
         }
     }
 
-    public OnFloorPosition chooseNextPosition(){
+    public OnFloorPosition chooseNextPosition() throws AllPositionVisited{
         if(!rawVisited(actualPosition.getRow())) {
             Log.e("FLOOR : ", "ROW CASE");
             return new OnFloorPosition(actualPosition.getRow(),Math.min(getHeight()-1-actualPosition.getCol(),getHeight()-1));
@@ -314,8 +317,10 @@ public class Floor {
                 }
             }
         }
-        return null;
+        throw new AllPositionVisited();
     }
+
+    public static class AllPositionVisited extends Exception{}
 
     public Direction changeBotDirection(OnFloorPosition newPosition) {
         int rawDiff=newPosition.getRow()-actualPosition.getRow();

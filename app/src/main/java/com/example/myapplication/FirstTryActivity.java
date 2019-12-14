@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.gioUtil.Floor;
+import it.unive.dais.legodroid.lib.gioUtil.PrimaProva;
 import it.unive.dais.legodroid.lib.gioUtil.SensorMaster;
 import it.unive.dais.legodroid.lib.gioUtil.TachoMaster;
 import it.unive.dais.legodroid.lib.gioUtil.Test;
@@ -42,6 +44,8 @@ public class FirstTryActivity extends AppCompatActivity {
 
     SensorMaster sensorMaster ;
 
+    public Float getAngle_checker(){return angle_checker;}
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +64,7 @@ public class FirstTryActivity extends AppCompatActivity {
             Log.e("FIRST TRY", "CANNOT connect to the fuckin lego");
         }
 
-        startButtonFirst.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::ev3Task2)));
+        startButtonFirst.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::ev3Task3)));
         stopButtonFirst.setOnClickListener(v->ev3.cancel());
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -79,6 +83,52 @@ public class FirstTryActivity extends AppCompatActivity {
         sensorManager.registerListener(sensorListener, smartphone_gyro , sensorManager.SENSOR_DELAY_FASTEST);
 
     }
+
+    private void ev3Task3(EV3.Api api) {
+        motorA = api.getTachoMotor(EV3.OutputPort.A);
+        motorD = api.getTachoMotor(EV3.OutputPort.D);
+        motorC = api.getTachoMotor(EV3.OutputPort.C);
+        ultra = api.getUltrasonicSensor(EV3.InputPort._1);
+
+        sensorMaster = new SensorMaster(ultra);
+
+        tachoMaster = new TachoMaster(motorD, motorA, motorC);
+
+        floor = new Floor(3, 3, 29.5f ,29.5f);
+
+        List<Floor.OnFloorPosition> minePosition = new ArrayList<>(); //TODO /*da mettere globale??*/
+
+        PrimaProva test = new PrimaProva(tachoMaster , floor  , sensorMaster);
+        int mine = 3 ;
+        try {
+            while (!ev3.isCancelled() && mine>0 ) {
+                test.findMine();
+                minePosition.add( test.takeMine()) ;
+                test.goToStartPosition();
+                test.releaseMine();
+                mine--;
+
+
+            }
+        }
+        catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Floor.AllPositionVisited allPositionVisited) {
+                allPositionVisited.printStackTrace();
+                Log.d("PRIMA PROVA : " , "Tutto il campo è stato visitato");
+        } finally {
+            Prelude.trap(()->tachoMaster.stopMotors());
+        }
+
+    }
+
+
+
+
 
     public void ev3Task(EV3.Api api){
         motorA=api.getTachoMotor(EV3.OutputPort.A);
@@ -138,7 +188,6 @@ public class FirstTryActivity extends AppCompatActivity {
 
         Test test = new Test(tachoMaster , floor  , sensorMaster);
         try {
-            /*Schifoso di merda*/
             PrimaProva3(mine);
         } catch (InterruptedException | IOException | ExecutionException e) {
             e.printStackTrace();
@@ -154,8 +203,8 @@ public class FirstTryActivity extends AppCompatActivity {
         Floor.OnFloorPosition newPosition = new Floor.OnFloorPosition(-1,-1); //TODO
         Thread.sleep(3000);
         while(mine>0){
-
             botMoves.clear();
+
             botMoves.add(floor.getStartPosition());
 
             while(!sensorMaster.objectInProximity()){
@@ -172,8 +221,12 @@ public class FirstTryActivity extends AppCompatActivity {
 
                     /***questo può stare in una ausiliaria ..... qua deve scegliere il punto dove andare che varia da dovè o solo per riga o solo per colonna*/
                     /**qui devo settare new Position*/
-                    newPosition = floor.chooseNextPosition(); /*se ho riga o colonna adiacenti da controllare vado fino in fondo
-                    altrimenti mi faccio restituire una nuova colonna a cui andare o riga*/
+                    try {
+                        newPosition = floor.chooseNextPosition(); /*se ho riga o colonna adiacenti da controllare vado fino in fondo
+                        altrimenti mi faccio restituire una nuova colonna a cui andare o riga*/
+                    } catch (Floor.AllPositionVisited allPositionVisited) {
+                        allPositionVisited.printStackTrace();
+                    }
 
 
                     Log.e("PRIMA PROVA 3 : ", "POSIZIONE SCELTA -----> RIGA : "+newPosition.getRow()+" COLONNA : "+newPosition.getCol());

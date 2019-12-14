@@ -21,7 +21,7 @@ public class Test {
 
         while(mine>0){
             while(!sensorMaster.objectInProximity()){
-                if((floor.getNextPosition().getRaw()>=0 &&floor.getNextPosition().getRaw() < floor.getWidth() )
+                if((floor.getNextPosition().getRow()>=0 &&floor.getNextPosition().getRow() < floor.getWidth() )
                         && (floor.getNextPosition().getCol() < floor.getHeight() && floor.getNextPosition().getCol()>=0) &&
                         (floor.getNextPosition().getCol()==floor.getPrevPosition().getCol()+1 || floor.getBotDirection()== Floor.Direction.VERTICAL_UP ||
                                 floor.getBotDirection()== Floor.Direction.VERTICAL_DOWN)){
@@ -36,8 +36,8 @@ public class Test {
                     tachoMaster.resetMovementMotorsPosition();
                     tachoMaster.getMotorsPosition();
                     switch(turnDirection){
-                        case TURN_LEFT:tachoMaster.turnNinetyLeft(20);break;
-                        case TURN_RIGHT:tachoMaster.turnNinetyRight(20);break;
+                        case TURN_LEFT:tachoMaster.turnNinetyLeft(20,183);break;
+                        case TURN_RIGHT:tachoMaster.turnNinetyRight(20,183);break;
                     }
                 }
             }
@@ -60,12 +60,12 @@ public class Test {
             if(tachoMaster.getMotorsCount()>630){
                 Log.e("HEIII","ZIO KEN");
                 floor.updateBotPosition();
-                if((floor.getNextPosition().getRaw()<0 || floor.getNextPosition().getRaw() >= floor.getWidth() )
+                if((floor.getNextPosition().getRow()<0 || floor.getNextPosition().getRow() >= floor.getWidth() )
                         || (floor.getNextPosition().getCol() >= floor.getHeight() || floor.getNextPosition().getCol()<0) ){
                     tachoMaster.stopMotors();
-                    tachoMaster.turnNinetyRight(20);
-                    tachoMaster.turnNinetyRight(20);
-                    tachoMaster.turnNinetyRight(20);
+                    tachoMaster.turnNinetyRight(20,183);
+                    tachoMaster.turnNinetyRight(20,183);
+                    tachoMaster.turnNinetyRight(20,183);
                     if(tachoMaster.getMotorsCount()>630){
                         int step =Math.round(tachoMaster.getMotorsCount())-630;
                         // tachoMaster.moveStepstraight(-20,0, step);
@@ -76,8 +76,8 @@ public class Test {
         }
         tachoMaster.stopMotors();
         tachoMaster.takeMine(-20,3000);
-        tachoMaster.turnNinetyRight(20);
-        tachoMaster.turnNinetyRight(20);
+        tachoMaster.turnNinetyRight(20,183);
+        tachoMaster.turnNinetyRight(20,183);
         tachoMaster.moveStepstraight(20,0,630);
 
     }
