@@ -119,7 +119,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
         tachoMaster = new TachoMaster(motorD, motorA, motorC);
 
-        floor = new Floor(6, 6, 29.5f ,29.5f);
+        floor = new Floor(3, 3, 29.5f ,29.5f);
 
         List<Floor.OnFloorPosition> minePosition = new ArrayList<>(); //TODO /*da mettere globale??*/
 
