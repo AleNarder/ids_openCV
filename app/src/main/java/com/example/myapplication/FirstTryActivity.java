@@ -117,7 +117,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
         sensorMaster = new SensorMaster(ultra, gyro);
 
-        tachoMaster = new TachoMaster(motorD, motorA, motorC);
+        tachoMaster = new TachoMaster(motorA, motorD, motorC);
 
         floor = new Floor(3, 3, 29.5f ,29.5f);
 

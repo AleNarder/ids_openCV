@@ -103,7 +103,7 @@ public class PrimaProva {
                 Log.d("PRIMA PROVA 3 : ", "MOTORS GOING ");
 
                 tachoMaster.resetMovementMotorsPosition();
-                tachoMaster.moveStraight(-30);
+                tachoMaster.moveStraight(30);
                 motors_going = true;
 
             }
@@ -120,7 +120,7 @@ public class PrimaProva {
                     motors_going = false;
                     nowhereToGo = true;
                     Thread.sleep(3000);
-                    tachoMaster.countAdjustment(-20, Math.round(tachoMaster.getMotorsCount()), tileDim);
+                    tachoMaster.countAdjustment(20, Math.round(tachoMaster.getMotorsCount()), tileDim);
                     tachoMaster.resetMovementMotorsPosition();
                     botMoves.add(new Floor.OnFloorPosition(floor.getActualPosition().getRow(), floor.getActualPosition().getCol()));
                     Log.e("PRIMA PROVA 3 : ", "POSITION ADDED : " + botMoves.get(botMoves.size() - 1).getRow() + botMoves.get(botMoves.size() - 1).getCol());
@@ -135,10 +135,10 @@ public class PrimaProva {
 
     public Floor.OnFloorPosition takeMine() throws InterruptedException, ExecutionException, IOException {
 
-        tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster);
-        tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
-        tachoMaster.takeMine(-20,3000);
+       // tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster);
        // tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
+        tachoMaster.takeMine(-20,3000);
+        tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
         floor.updateBotPosition();
         floor.updateNextPosition();
         tachoMaster.takeMine(-20,2000);
@@ -179,7 +179,7 @@ public class PrimaProva {
 
             if(!motors_going && floor.getActualPosition().compareTo(newPosition)!=0){
                 tachoMaster.resetMovementMotorsPosition();
-                tachoMaster.moveStraight(-30);
+                tachoMaster.moveStraight(30);
                 motors_going=true;
             }
             if(tachoMaster.getMotorsCount()>tileDim && motors_going){  /** dovrei avere (grandezza della piastrella *20)+20*/

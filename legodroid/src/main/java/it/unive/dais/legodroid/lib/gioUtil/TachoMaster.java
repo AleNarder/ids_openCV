@@ -193,7 +193,7 @@ public class TachoMaster {
         armMotor.start();
     }
     public void takeMine(int speed , int step) throws IOException, ExecutionException, InterruptedException {
-        armDown(speed);
+        armDown(speed,step);
     }
 
     public void releaseMine(int speed,int step) throws InterruptedException, ExecutionException, IOException {
