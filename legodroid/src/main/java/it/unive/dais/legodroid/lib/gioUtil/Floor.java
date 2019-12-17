@@ -422,6 +422,8 @@ public class Floor {
         }
     }
 
+
+
     private static class BotDirection{
         private int y = 0, x = 0; Direction direction;
         private BotDirection(Direction d){

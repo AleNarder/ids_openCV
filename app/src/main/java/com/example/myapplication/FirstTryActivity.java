@@ -1,15 +1,8 @@
 package com.example.myapplication;
 
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -25,6 +18,7 @@ import it.unive.dais.legodroid.lib.gioUtil.PrimaProva;
 import it.unive.dais.legodroid.lib.gioUtil.SensorMaster;
 import it.unive.dais.legodroid.lib.gioUtil.TachoMaster;
 import it.unive.dais.legodroid.lib.gioUtil.Test;
+import it.unive.dais.legodroid.lib.plugs.GyroSensor;
 import it.unive.dais.legodroid.lib.plugs.TachoMotor;
 import it.unive.dais.legodroid.lib.plugs.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Prelude;
@@ -36,15 +30,10 @@ public class FirstTryActivity extends AppCompatActivity {
     Floor floor;
     EV3 ev3 ;
     UltrasonicSensor ultra;
-    private Sensor smartphone_gyro;
-
-    private SensorManager sensorManager;
-
-    private Float angle_checker;
+    GyroSensor gyro;
 
     SensorMaster sensorMaster ;
 
-    public Float getAngle_checker(){return angle_checker;}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,21 +56,56 @@ public class FirstTryActivity extends AppCompatActivity {
         startButtonFirst.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::ev3Task3)));
         stopButtonFirst.setOnClickListener(v->ev3.cancel());
 
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        smartphone_gyro = sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
-        SensorEventListener sensorListener = new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent sensorEvent) {
-                angle_checker = sensorEvent.values[0];
-            }
+    }
 
+
+    private void threadTest(EV3.Api api){
+        Thread a = new Thread(){
             @Override
-            public void onAccuracyChanged(Sensor sensor, int i) {
+            public void run(){
 
             }
         };
-        sensorManager.registerListener(sensorListener, smartphone_gyro , sensorManager.SENSOR_DELAY_FASTEST);
+        a.start();
+    }
 
+    private void gyroTest(EV3.Api api){
+        motorA = api.getTachoMotor(EV3.OutputPort.A);
+        motorD = api.getTachoMotor(EV3.OutputPort.D);
+        motorC = api.getTachoMotor(EV3.OutputPort.C);
+        ultra = api.getUltrasonicSensor(EV3.InputPort._1);
+        gyro = api.getGyroSensor(EV3.InputPort._3);
+
+        sensorMaster = new SensorMaster(ultra, gyro);
+
+        tachoMaster = new TachoMaster(motorD, motorA, motorC);
+
+        float init_angle , final_angle;
+
+        boolean motors_going=false;
+        try{
+            while(!ev3.isCancelled()){
+                init_angle = sensorMaster.getGyroAngle();
+                while((sensorMaster.getGyroAngle()-init_angle)<82) {
+                    if (!motors_going) {
+                        motorA.setSpeed(10);
+                        motorD.setSpeed(-10);
+                        motorD.start();
+                        motorA.start();
+                        motors_going = true;
+                    }
+                }
+                Prelude.trap(()->{motorA.stop(); motorD.stop();});
+                motors_going=false;
+                Log.e("SENSOR MASTER = " , "ANGOLO = "+sensorMaster.getGyroAngle());
+                Log.e("SENSOR MASTER = ", "DIFFERENZA ANGOLI = "+Math.round(sensorMaster.getGyroAngle()-init_angle));
+                Thread.sleep(5000);
+            }
+        }
+        catch(Exception e){}
+        finally{
+            Prelude.trap(()->{motorA.stop(); motorD.stop();});
+        }
     }
 
     private void ev3Task3(EV3.Api api) {
@@ -89,16 +113,17 @@ public class FirstTryActivity extends AppCompatActivity {
         motorD = api.getTachoMotor(EV3.OutputPort.D);
         motorC = api.getTachoMotor(EV3.OutputPort.C);
         ultra = api.getUltrasonicSensor(EV3.InputPort._1);
+        gyro = api.getGyroSensor(EV3.InputPort._3);
 
-        sensorMaster = new SensorMaster(ultra);
+        sensorMaster = new SensorMaster(ultra, gyro);
 
         tachoMaster = new TachoMaster(motorD, motorA, motorC);
 
-        floor = new Floor(3, 3, 29.5f ,29.5f);
+        floor = new Floor(6, 6, 29.5f ,29.5f);
 
         List<Floor.OnFloorPosition> minePosition = new ArrayList<>(); //TODO /*da mettere globale??*/
 
-        PrimaProva test = new PrimaProva(tachoMaster , floor  , sensorMaster);
+        PrimaProva test = new PrimaProva(getApplicationContext(), tachoMaster , floor  , sensorMaster);
         int mine = 3 ;
         try {
             while (!ev3.isCancelled() && mine>0 ) {
@@ -125,6 +150,17 @@ public class FirstTryActivity extends AppCompatActivity {
         }
 
     }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -178,7 +214,7 @@ public class FirstTryActivity extends AppCompatActivity {
         motorC = api.getTachoMotor(EV3.OutputPort.C);
         ultra = api.getUltrasonicSensor(EV3.InputPort._1);
 
-        sensorMaster = new SensorMaster(ultra);
+        sensorMaster = new SensorMaster(ultra, gyro);
 
         tachoMaster = new TachoMaster(motorD, motorA, motorC);
 
@@ -238,17 +274,7 @@ public class FirstTryActivity extends AppCompatActivity {
                     Floor.TurnDirection turn = floor.turnDirection(d);
 
                     Log.e("PRIMA PROVA 3 : ", "TURN DIRECTION "+turn);
-
-                    initAngle=angle_checker;
                     tachoMaster.turnBot(10,183,turn);
-                    finalAngle=angle_checker;
-                    int ok=0;
-                    while(!okAngle && ok<10){
-                        okAngle=tachoMaster.adjustTurn(turn,initAngle,finalAngle);
-                        Thread.sleep(1000);
-                        finalAngle=angle_checker;
-                        ok++;
-                    }
 
 
                     nowhereToGo=false;
@@ -314,16 +340,9 @@ public class FirstTryActivity extends AppCompatActivity {
                     Floor.Direction d = floor.changeBotDirection(botMoves.get(i));
                     Floor.TurnDirection turn = floor.turnDirection(d);
 
-                    initAngle=angle_checker;
+
                     tachoMaster.turnBot(10,183,turn);
-                    finalAngle=angle_checker;
-                    int ok=0;
-                    while(!okAngle && ok<10){
-                        okAngle=tachoMaster.adjustTurn(turn,initAngle,finalAngle);
-                        Thread.sleep(1000);
-                        finalAngle=angle_checker;
-                        ok++;
-                    }
+
 
 
 

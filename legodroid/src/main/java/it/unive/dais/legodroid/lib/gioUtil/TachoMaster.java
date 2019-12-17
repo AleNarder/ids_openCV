@@ -110,8 +110,8 @@ public class TachoMaster {
     public void turn(int speed , TachoMotor m1 , TachoMotor m2,int step) throws IOException, ExecutionException, InterruptedException {
         m1.setStepSpeed(speed,0,step,0,true);
         m2.setStepSpeed(-speed,0,step,0,true);
-        m1.waitCompletion();
-        m2.waitCompletion();
+       // m1.waitCompletion();
+       //id m2.waitCompletion();
         m1.waitUntilReady();
         m2.waitUntilReady();
 
@@ -124,26 +124,80 @@ public class TachoMaster {
         turn(speed,leftMotor,rightMotor,step);
 
     }
-    public void UinversionTurn(int speed , int step) throws InterruptedException, ExecutionException, IOException {
+    public void turnNinetyRight(int speed , SensorMaster sensorMaster) throws IOException, ExecutionException, InterruptedException {
+        boolean motors_going = false;
+        float tmp;
+        float init_angle=sensorMaster.getGyroAngle();
+        Log.e("TACHOMASTER : " , "INIT ANGLE = "+init_angle);
+        while(Math.abs((tmp=sensorMaster.getGyroAngle())-init_angle)<80){
+            Log.e("TACHOMASTER : " , "ANGLE VARIATION = "+tmp);
+            if(!motors_going){
+                rightMotor.setSpeed(-speed);
+                leftMotor.setSpeed(speed);
+                rightMotor.start();
+                leftMotor.start();
+                motors_going=true;
+            }
+
+        }
+        Log.e("SENSOR MASTER = ", "DIFFERENZA ANGOLI = "+Math.round(sensorMaster.getGyroAngle()-init_angle));
+
+        rightMotor.stop();
+        leftMotor.stop();
+
+    }
+    public void turnNinetyLeft(int speed, SensorMaster sensorMaster) throws InterruptedException, ExecutionException, IOException {
+        boolean motors_going = false;
+        float tmp;
+        float init_angle=sensorMaster.getGyroAngle();
+        Log.e("TACHOMASTER : " , "INIT ANGLE = "+init_angle);
+        while(Math.abs(init_angle-(tmp=sensorMaster.getGyroAngle()))<80){ //TODO
+            Log.e("TACHOMASTER : " , "ANGLE VARIATION = "+tmp);
+            if(!motors_going){
+                rightMotor.setSpeed(speed);
+                leftMotor.setSpeed(-speed);
+                leftMotor.start();
+                rightMotor.start();
+                motors_going=true;
+            }
+
+        }
+        Log.e("SENSOR MASTER = ", "DIFFERENZA ANGOLI = "+Math.round(init_angle-sensorMaster.getGyroAngle()));
+        rightMotor.stop();
+        leftMotor.stop();
+    }
+    public void uInversionTurn(int speed , int step) throws InterruptedException, ExecutionException, IOException {
         turnNinetyRight(speed,step);
         turnNinetyRight(speed,step);
+    }
+
+    public void uInversionTurn(int speed , SensorMaster sensorMaster) throws InterruptedException, ExecutionException, IOException {
+        turnNinetyRight(speed, sensorMaster);
+        turnNinetyRight(speed,sensorMaster);
     }
 
     public float getMotorsCount() throws IOException, ExecutionException, InterruptedException {
         return Math.max(rightMotor.getPosition().get(),leftMotor.getPosition().get());
     }
 
-    public void armDown(int speed , int step) throws IOException, ExecutionException, InterruptedException {
+    public void armDown(int speed , int step) throws IOException {
         armMotor.setTimeSpeed(speed,0,step,0,true);
         armMotor.waitCompletion();
         armMotor.stop();
     }
+    public void armDown(int speed) throws IOException, ExecutionException, InterruptedException {
+        //armMotor.setTimeSpeed(speed,0,step,0,true);
+       // armMotor.waitCompletion();
+       // armMotor.stop();
+        armMotor.setSpeed(speed);
+        armMotor.start();
+    }
     public void takeMine(int speed , int step) throws IOException, ExecutionException, InterruptedException {
-        armDown(speed,step);
+        armDown(speed);
     }
 
     public void releaseMine(int speed,int step) throws InterruptedException, ExecutionException, IOException {
-        armDown(speed,step);
+        armDown(-speed,step);
     }
 
 
@@ -156,7 +210,23 @@ public class TachoMaster {
                 turnNinetyLeft(speed,step);
                 break;
             case U_INVERSION:
-                UinversionTurn(speed,step);
+                uInversionTurn(speed,step);
+                break;
+        }
+        Thread.sleep(1000);
+    }
+
+    public void turnBot(int speed , Floor.TurnDirection turn , SensorMaster sensorMaster) throws InterruptedException, ExecutionException, IOException {
+        Thread.sleep(2000);
+        switch(turn){
+            case TURN_RIGHT:
+                turnNinetyRight(speed,sensorMaster);
+                break;
+            case TURN_LEFT:
+                turnNinetyLeft(speed,sensorMaster);
+                break;
+            case U_INVERSION:
+                uInversionTurn(speed,sensorMaster);
                 break;
         }
         Thread.sleep(1000);
@@ -169,8 +239,9 @@ public class TachoMaster {
             moveStepstraight(-speed,0,actualStep-finalStep);
     }
 
-    public boolean adjustTurn( Floor.TurnDirection turn, float initAngle, float finalAngle) throws InterruptedException, ExecutionException, IOException {
+    public boolean adjustTurn( Floor.TurnDirection turn, float initAngle, float finalAngle , int stepNinety) throws InterruptedException, ExecutionException, IOException {
         boolean okAngle=false;
+        Float diff;
         Log.e("TACHOMASTE :","NON MODIFICATI   ------- ANGOLO INIZIALE = "+initAngle+" ANGOLO FINALE = "+finalAngle);
 
         if(turn!=U_INVERSION) {
@@ -182,29 +253,29 @@ public class TachoMaster {
 
         Log.e("TACHOMASTE :","ANGOLO INIZIALE = "+initAngle+" ANGOLO FINALE = "+finalAngle);
         switch(turn){
-            case NO_TURN :break;
+            case NO_TURN :okAngle=true;
             case TURN_LEFT:
 
-                if(Math.abs(finalAngle-initAngle)<78) {
-                    turnBot(10, 5, TURN_LEFT);
+                if((diff=Math.abs(finalAngle-initAngle))<75) {
+                    turnBot(10, Math.round(stepNinety/90*(90-diff)), TURN_LEFT);
                 }
                 else
-                if(Math.abs(finalAngle-initAngle)>82) {
-                    turnBot(10, 5, TURN_RIGHT);
+                if(Math.abs(finalAngle-initAngle)>85) {
+                    turnBot(10, Math.round(stepNinety/90*(diff-90)), TURN_RIGHT);
                 }
                 else okAngle=true;
 
             case TURN_RIGHT:
 
 
-                if(Math.abs(finalAngle-initAngle)<78) {
-                    turnBot(10, 5, TURN_RIGHT);
+                if((diff=Math.abs(finalAngle-initAngle))<75) {
+                    turnBot(10,Math.round(stepNinety/90) , TURN_RIGHT);
                     Log.e("TACHOMASTE :","CONTINUO DESTRA");
 
                 }
                 else
-                if(Math.abs(finalAngle-initAngle)>82) {
-                    turnBot(10, 5, TURN_LEFT);
+                if((diff=Math.abs(finalAngle-initAngle))>85) {
+                    turnBot(10, Math.round(stepNinety/90), TURN_LEFT);
                     Log.e("TACHOMASTE :","VADO SINISTRA");
 
                 }
@@ -212,12 +283,12 @@ public class TachoMaster {
 
 
             case U_INVERSION:
-                if(Math.abs(finalAngle-initAngle)<178) {
-                    turnBot(10, 5, TURN_RIGHT);
+                if((diff=Math.abs(finalAngle-initAngle))<165) {
+                    turnBot(10, Math.round(stepNinety/90*(180-diff)), TURN_RIGHT);
                 }
                 else
-                if(Math.abs(finalAngle-initAngle)>182) {
-                    turnBot(10, 5, TURN_LEFT);
+                if((diff=Math.abs(finalAngle-initAngle))>175) {
+                    turnBot(10, Math.round(stepNinety/90*(diff-180)), TURN_LEFT);
                 }
                 else okAngle=true;
 
