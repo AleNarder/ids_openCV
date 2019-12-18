@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -41,7 +42,10 @@ public class FirstTryActivity extends AppCompatActivity {
 
     LinearLayout ll;
 
-    int cnt=0,x,y;
+    int cnt=0,x=-1,y=-1;
+    EditText et1, et2;
+
+    Integer n,m;
 
 
     @Override
@@ -53,6 +57,9 @@ public class FirstTryActivity extends AppCompatActivity {
         Button startButtonFirst= findViewById(R.id.startButtonFirst);
         Button stopButtonFirst = findViewById(R.id.stopButtonFirst);
 
+        et1 = findViewById(R.id.editText1);
+        et2 = findViewById(R.id.editText2);
+
         try {
             BluetoothConnection.BluetoothChannel ch = new BluetoothConnection("EV3MCLOVIN").connect(); // replace with your own brick name
             ev3=new EV3(ch);
@@ -63,11 +70,23 @@ public class FirstTryActivity extends AppCompatActivity {
 
         startButtonFirst.setOnClickListener(v -> {
             setContentView(R.layout.activity_map);
+
+            Button stopButton2 = findViewById(R.id.stopButton2);
+            stopButton2.setOnClickListener(v2 -> ev3.cancel());
+            
             ll = findViewById(R.id.linearlayout0);
-            creaMap(10,10,x,y);
-            //ll.removeAllViews();
-            //Prelude.trap(() -> ev3.run(this::ev3Task3));
+
+            String s1 = et1.getText().toString();
+            String s2 = et2.getText().toString();
+            n = new Integer(s1);
+            m = new Integer(s2);
+
+            creaMap(n,m,x,y);
+
+            Prelude.trap(() -> ev3.run(this::ev3Task3));
         });
+
+
         stopButtonFirst.setOnClickListener(v->ev3.cancel());
 
     }
@@ -177,7 +196,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
         tachoMaster = new TachoMaster(motorA, motorD, motorC);
 
-        floor = new Floor(3, 3, 29.5f ,29.5f);
+        floor = new Floor(n,m, 29.5f ,29.5f);
 
         List<Floor.OnFloorPosition> minePosition = new ArrayList<>(); //TODO /*da mettere globale??*/
 
@@ -187,14 +206,19 @@ public class FirstTryActivity extends AppCompatActivity {
             while (!ev3.isCancelled() && mine>0 ) {
                 test.findMine();
                 Floor.OnFloorPosition pos = test.takeMine() ;
+
                 x = pos.getRow();
-                y=pos.getCol();
-                ll.removeAllViews();
-                creaMap(floor.getWidth(),floor.getHeight(),x,y);
+                y = pos.getCol();
+
+                runOnUiThread(() -> {
+                    Log.e("====>", "aggiormo mappa");
+                    ll.removeAllViews();
+                    creaMap(floor.getWidth(),floor.getHeight(),x,y);
+                });
+
                 test.goToStartPosition();
                 test.releaseMine();
                 mine--;
-
 
             }
         }

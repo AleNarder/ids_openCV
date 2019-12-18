@@ -137,11 +137,15 @@ public class PrimaProva {
 
        // tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster);
        // tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
-        tachoMaster.takeMine(-20,3000);
+        //tachoMaster.releaseMine(20,3000);
         tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
+        tachoMaster.takeMine(-20,3000);tachoMaster.releaseMine(20,3000);
+
+        //tachoMaster.takeMine(-20,3000);
+      //  tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
         floor.updateBotPosition();
         floor.updateNextPosition();
-        tachoMaster.takeMine(-20,2000);
+        //tachoMaster.takeMine(-20,2000);
         tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster);
 
         Log.e("PRIMA PROVA 3 : ", "ACTUALPOSITION :  ROW : "+floor.getActualPosition().getRow()+" COL : "+floor.getActualPosition().getCol());
