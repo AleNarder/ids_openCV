@@ -22,7 +22,6 @@ public class DispatcherActivity extends AppCompatActivity {
 
         Intent openCVIntent = new Intent (getBaseContext() ,  MainActivity.class);
 
-
         testButton.setOnClickListener(v->startActivity(testIntent));
         openCVButton.setOnClickListener(v->startActivity(openCVIntent));
 

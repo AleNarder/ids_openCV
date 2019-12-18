@@ -1,8 +1,12 @@
 package com.example.myapplication;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +23,7 @@ import it.unive.dais.legodroid.lib.gioUtil.SensorMaster;
 import it.unive.dais.legodroid.lib.gioUtil.TachoMaster;
 import it.unive.dais.legodroid.lib.gioUtil.Test;
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
+import it.unive.dais.legodroid.lib.plugs.LightSensor;
 import it.unive.dais.legodroid.lib.plugs.TachoMotor;
 import it.unive.dais.legodroid.lib.plugs.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Prelude;
@@ -34,6 +39,10 @@ public class FirstTryActivity extends AppCompatActivity {
 
     SensorMaster sensorMaster ;
 
+    LinearLayout ll;
+
+    int cnt=0,x,y;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +52,6 @@ public class FirstTryActivity extends AppCompatActivity {
 
         Button startButtonFirst= findViewById(R.id.startButtonFirst);
         Button stopButtonFirst = findViewById(R.id.stopButtonFirst);
-        Button connectButton = findViewById(R.id.connect);
 
         try {
             BluetoothConnection.BluetoothChannel ch = new BluetoothConnection("EV3MCLOVIN").connect(); // replace with your own brick name
@@ -53,10 +61,60 @@ public class FirstTryActivity extends AppCompatActivity {
             Log.e("FIRST TRY", "CANNOT connect to the fuckin lego");
         }
 
-        startButtonFirst.setOnClickListener(v -> Prelude.trap(() -> ev3.run(this::ev3Task3)));
+        startButtonFirst.setOnClickListener(v -> {
+            setContentView(R.layout.activity_map);
+            ll = findViewById(R.id.linearlayout0);
+            creaMap(10,10,x,y);
+            //ll.removeAllViews();
+            //Prelude.trap(() -> ev3.run(this::ev3Task3));
+        });
         stopButtonFirst.setOnClickListener(v->ev3.cancel());
 
     }
+
+    /**************************************************************************************************************************/
+    public void creaMap(int n, int m, int x, int y){
+        for(int i=0;i<n;i++)
+            addButton(i,m,x,y);
+    }
+
+    public void addButton(int n, int m, int x, int y){
+        LinearLayout ll2 = new LinearLayout(this);
+        ll2.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams ll_params =
+                new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ll2.setLayoutParams(ll_params);
+        ll.addView(ll2);
+
+        for(int i=0;i<m;i++){
+            Button btn = new Button(this);
+
+            LinearLayout.LayoutParams b_params = new LinearLayout.LayoutParams(0, 100,1);
+            btn.setLayoutParams(b_params);
+            ll2.addView(btn);
+            btn.setId(cnt);
+            cnt++;
+
+            /** set color */
+            if (n==x && i==y)
+                btn.setBackgroundColor(Color.RED);
+
+            final int x2 = i;
+            btn.setOnClickListener(v-> Toast.makeText(FirstTryActivity.this, "["+n+","+x2+"]", Toast.LENGTH_LONG).show());
+        }
+    }
+
+    public void setColorButton(int x, int y, Button btn){
+        int cnt=0;
+        for(int i=0;i<x;i++){
+            for(int j=0;j<y;j++){
+                cnt++;
+            }
+        }
+        //btn.findViewById(R.id.cnt);
+        btn.setBackgroundColor(Color.RED);
+    }
+    /**************************************************************************************************************************/
 
 
     private void threadTest(EV3.Api api){
@@ -128,7 +186,11 @@ public class FirstTryActivity extends AppCompatActivity {
         try {
             while (!ev3.isCancelled() && mine>0 ) {
                 test.findMine();
-                minePosition.add( test.takeMine()) ;
+                Floor.OnFloorPosition pos = test.takeMine() ;
+                x = pos.getRow();
+                y=pos.getCol();
+                ll.removeAllViews();
+                creaMap(floor.getWidth(),floor.getHeight(),x,y);
                 test.goToStartPosition();
                 test.releaseMine();
                 mine--;
