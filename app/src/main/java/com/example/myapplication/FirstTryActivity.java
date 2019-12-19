@@ -73,7 +73,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
             Button stopButton2 = findViewById(R.id.stopButton2);
             stopButton2.setOnClickListener(v2 -> ev3.cancel());
-            
+
             ll = findViewById(R.id.linearlayout0);
 
             String s1 = et1.getText().toString();
@@ -83,7 +83,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
             creaMap(n,m,x,y);
 
-            Prelude.trap(() -> ev3.run(this::ev3Task3));
+            Prelude.trap(() -> ev3.run(this::ev3Task4));
         });
 
 
@@ -114,7 +114,6 @@ public class FirstTryActivity extends AppCompatActivity {
             btn.setId(cnt);
             cnt++;
 
-            /** set color */
             if (n==x && i==y)
                 btn.setBackgroundColor(Color.RED);
 
@@ -238,19 +237,37 @@ public class FirstTryActivity extends AppCompatActivity {
     }
 
 
+    public void ev3Task4(EV3.Api api){
+        motorA=api.getTachoMotor(EV3.OutputPort.A);
+        motorD=api.getTachoMotor(EV3.OutputPort.D);
+        motorC=api.getTachoMotor(EV3.OutputPort.C);
 
+        tachoMaster = new TachoMaster(motorD,motorA,motorC);
 
+        ultra = api.getUltrasonicSensor(EV3.InputPort._1);
+        gyro = api.getGyroSensor(EV3.InputPort._3);
 
+        sensorMaster = new SensorMaster(ultra, gyro);
 
+        boolean motors_going=false;
 
+        try {
+            while (!sensorMaster.objectInProximity()) {
+                if(!motors_going){
+                    tachoMaster.moveStraight(20);
+                }
+            }
+            tachoMaster.stopMotors();
+            tachoMaster.moveStepstraight(20,0,50);
+            motorC.setSpeed(20);
+            motorC.start();
+            tachoMaster.turnNinetyRight(20,173);
+            tachoMaster.turnNinetyRight(20,173);
+            tachoMaster.moveStepstraight(20,0,200);
 
-
-
-
-
-
-
-
+        }
+        catch(Exception e ){}
+    }
 
     public void ev3Task(EV3.Api api){
         motorA=api.getTachoMotor(EV3.OutputPort.A);
