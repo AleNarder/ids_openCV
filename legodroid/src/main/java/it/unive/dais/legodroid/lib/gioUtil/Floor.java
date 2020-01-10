@@ -30,7 +30,7 @@ public class Floor {
         private float width , height;
         private int onFloorRaw , onFloorCol;
         private OnFloorPosition position;
-        private boolean mine;
+        private boolean mine; //TODO BISOGNA METTERE IL COLORE __> FARE CLASSE MINE
         private boolean checked;
 
 
@@ -41,6 +41,7 @@ public class Floor {
             this.onFloorCol=onFloorCol;
             position = new OnFloorPosition(onFloorRaw, onFloorCol);
             checked=false;
+            mine=false;
         }
 
         public boolean getChecked(){return checked;}
@@ -67,6 +68,8 @@ public class Floor {
         }
 
         public float getMeanWidth(){return width/2;}
+
+        public boolean getMine(){return mine;}
 
     }
 
@@ -422,6 +425,62 @@ public class Floor {
         }
     }
 
+
+    /**ALGORITMI SECONDA PROVA**/
+
+
+    /**crea un percorso virtuale da un punto A (la mia posizione) a un punto B.
+     * questa lista servirà per controllare se ci sono mine indesiderate lungo il percorso e quindi cambiarlo**/
+    public List<OnFloorPosition> createVirtualRoad(OnFloorPosition destination , Direction bt){
+
+        OnFloorPosition tempPosition = new OnFloorPosition(getActualPosition().getRow(),getActualPosition().getCol());
+        List<OnFloorPosition> road = new ArrayList<>();
+        BotDirection virtualDirection = new BotDirection(bt);
+
+        while(tempPosition.compareTo(destination)!=0){
+            road.add(tempPosition);
+
+            if(tempPosition.getRow()==destination.getRow() || tempPosition.getCol()==destination.getCol() || notThatWay(tempPosition,virtualDirection)){
+                Direction d =changeBotDirection(destination);
+                virtualDirection.changeDirection(d);
+            }
+            tempPosition.setOnFloorPosition(tempPosition.getRow()+virtualDirection.getY(),tempPosition.getCol()+virtualDirection.getX());
+        }
+
+        return road;
+    }
+
+    private boolean notThatWay(OnFloorPosition pos , BotDirection bt){
+        OnFloorPosition temp=new OnFloorPosition(pos.getRow(),pos.getCol());
+        temp.setOnFloorPosition(temp.getRow()+bt.getY(),temp.getCol()+bt.getY());
+
+        if((temp.getRow()<0 || temp.getRow()>=getWidth()) || (temp.getCol()<0 || temp.getCol()>= getHeight()))
+            return true;
+        return false;
+    }
+
+    public boolean freeRoad(List<OnFloorPosition> road , OnFloorPosition destination){
+        for(int i = 0 ;i<road.size() ; i++){
+            if(field[road.get(i).getRow()][road.get(i).getCol()].getMine() && road.get(i).compareTo(destination)!=0)
+                return false;
+        }
+        return true;
+    }
+
+    public List<OnFloorPosition> findRoad(OnFloorPosition destination){
+        List<OnFloorPosition> road = createVirtualRoad(destination,getBotDirection());
+        if(!freeRoad(road,destination)){
+            List<Direction> dir = new ArrayList<>();
+            dir.add(Direction.HORIZONTAL_DOWN); dir.add(Direction.HORIZONTAL_UP); dir.add(Direction.VERTICAL_DOWN); dir.add(Direction.VERTICAL_UP);
+            for(int i=0;i<dir.size();i++){
+                if(dir.get(i)!=getBotDirection()){
+                    road=createVirtualRoad(destination,dir.get(i));
+                }
+                if(freeRoad(road,destination)) break;
+            }
+        }
+        return road; //TODO SE NON C'E' STRADA  ME NE RITORNA UNA SBAGLIATA
+    }
 
 
     private static class BotDirection{
