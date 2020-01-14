@@ -13,6 +13,7 @@ public class Floor {
     public  static class OnFloorPosition implements Comparable<OnFloorPosition>{
         private int i , j ;
         public OnFloorPosition(int i , int j){this.i=i; this.j = j;}
+        public OnFloorPosition(OnFloorPosition pos){this.i = pos.getRow(); this.j=pos.getCol();}
         public int getRow(){return i;}
         public int getCol(){return j;}
         public void setOnFloorPosition(int i , int j){this.i =i ; this.j=j;}
@@ -114,6 +115,7 @@ public class Floor {
 
     }
 
+    public BotDirection getBot(){return botDirection;}
     public OnFloorPosition getActualPosition() {
         return actualPosition;
     }
@@ -137,6 +139,8 @@ public class Floor {
         return height;
     }
 
+    public boolean getMine(OnFloorPosition pos){return field[pos.getRow()][pos.getCol()].getMine();}
+
     public Direction getBotDirection(){return botDirection.getDirection();}
 
     public void updateBotPosition(){
@@ -154,28 +158,7 @@ public class Floor {
 
 
     /** SECONDO ME NON DEVE STARE QUI**/
-    public TurnDirection chooseNextDirection(){
-        if(actualPosition.getRow()==getWidth()-1 && actualPosition.getCol()<getHeight()-1){
-            botDirection.setDirection(Direction.HORIZONTAL_UP);
-            return TurnDirection.TURN_RIGHT;
-        }
-        else {
-            if (actualPosition.getRow() == getWidth()-1 && actualPosition.getCol() == getHeight()-1) {
-                botDirection.setDirection(Direction.VERTICAL_DOWN);
-                return TurnDirection.TURN_RIGHT;
-            }
-            else {
-                if(actualPosition.getRow() < getWidth()-1 && actualPosition.getCol() < getHeight()-1){
-                    botDirection.setDirection(Direction.HORIZONTAL_DOWN);
-                    return TurnDirection.TURN_RIGHT;
-                }
-                else {
-                    botDirection.setDirection(Direction.VERTICAL_UP);
-                    return TurnDirection.TURN_RIGHT;
-                }
-            }
-        }
-    }
+
 
     public TurnDirection chooseNDPrimaProva(){
         if(actualPosition.getRow()==getWidth()-1 && botDirection.getDirection()==Direction.VERTICAL_UP){
@@ -221,11 +204,6 @@ public class Floor {
         return true;
     }
 
-    public int chooseNextRaw() {
-        for(int i=0;i<getWidth();i++)
-            if(!rawVisited(i)) return i;
-        return -1;
-    }
     public int chooseNextCol(){
         for(int j=0;j<getHeight();j++)
             if(!colVisited(j))return j;
@@ -294,198 +272,25 @@ public class Floor {
         }
     }
 
-    public OnFloorPosition chooseNextPosition() throws AllPositionVisited{
-        if(!rawVisited(actualPosition.getRow())) {
-            Log.e("FLOOR : ", "ROW CASE");
-            return new OnFloorPosition(actualPosition.getRow(),Math.min(getHeight()-1-actualPosition.getCol(),getHeight()-1));
 
-        }
-        else {
-            if(!colVisited((actualPosition.getCol()))){
-                Log.e("FLOOR : ", "COL CASE");
-                return new OnFloorPosition(Math.min(getWidth()-1-actualPosition.getRow(),getWidth()-1),actualPosition.getCol());
-            }
-            else{ //TODO
-                int raw=chooseNextRaw();
-                if(raw!=-1) {
-                    if(actualPosition.getCol()==0 || actualPosition.getCol()==getHeight()-1)
-                        return new OnFloorPosition(raw, actualPosition.getCol());
-                    else {
-                        if(getHeight()-1-actualPosition.getCol()>actualPosition.getCol())
-                            return new OnFloorPosition(actualPosition.getRow(), 0);
-                        else
-                            return new OnFloorPosition((actualPosition).getRow(),getHeight()-1);
 
-                    }
-                }
-            }
-        }
-        throw new AllPositionVisited();
-    }
 
-    public static class AllPositionVisited extends Exception{}
 
-    public Direction changeBotDirection(OnFloorPosition newPosition) {
-        int rawDiff=newPosition.getRow()-actualPosition.getRow();
-        int colDiff=newPosition.getCol()-actualPosition.getCol();
-        if(rawDiff!=0){
-            if(rawDiff<0){
-                //botDirection.setDirection(Direction.VERTICAL_DOWN);
-                return Direction.VERTICAL_DOWN;
-            }
-            else {
-                //botDirection.setDirection(Direction.VERTICAL_UP);
-                return Direction.VERTICAL_UP;
-            }
-        }
-        else{
-            if(colDiff<0){
-                // botDirection.setDirection(Direction.HORIZONTAL_DOWN);
-                return Direction.HORIZONTAL_DOWN;
-            }
-            else{
-                // botDirection.setDirection(Direction.HORIZONTAL_UP);
-                return Direction.HORIZONTAL_UP;
-            }
-        }
-
-    }
-
-    public TurnDirection turnDirection(Direction d){
-        switch(botDirection.getDirection()){
-            case HORIZONTAL_DOWN:
-                switch(d){
-                    case HORIZONTAL_DOWN:
-                        return TurnDirection.NO_TURN;
-                    case HORIZONTAL_UP:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.U_INVERSION;
-                    case VERTICAL_UP:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.TURN_RIGHT;
-                    case VERTICAL_DOWN:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.TURN_LEFT;
-                }
-            case HORIZONTAL_UP:
-                switch(d){
-                    case HORIZONTAL_DOWN:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.U_INVERSION;
-                    case HORIZONTAL_UP:
-                        return TurnDirection.NO_TURN;
-                    case VERTICAL_UP:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.TURN_LEFT;
-                    case VERTICAL_DOWN:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.TURN_RIGHT;
-                }
-            case VERTICAL_UP:
-                switch(d){
-                    case HORIZONTAL_DOWN:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.TURN_LEFT;
-                    case HORIZONTAL_UP:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.TURN_RIGHT;
-                    case VERTICAL_UP:
-                        return TurnDirection.NO_TURN;
-                    case VERTICAL_DOWN:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.U_INVERSION;
-                }
-            case VERTICAL_DOWN:
-                switch(d){
-                    case HORIZONTAL_DOWN:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.TURN_RIGHT;
-                    case HORIZONTAL_UP:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.TURN_LEFT;
-                    case VERTICAL_UP:
-                        botDirection.setDirection(d);
-                        updateNextPosition();
-                        return TurnDirection.U_INVERSION;
-                    case VERTICAL_DOWN:
-                        return TurnDirection.NO_TURN;
-                }
-            default:return TurnDirection.NO_TURN;
-        }
-    }
 
 
     /**ALGORITMI SECONDA PROVA**/
 
 
+
+
+
     /**crea un percorso virtuale da un punto A (la mia posizione) a un punto B.
      * questa lista servirà per controllare se ci sono mine indesiderate lungo il percorso e quindi cambiarlo**/
-    public List<OnFloorPosition> createVirtualRoad(OnFloorPosition destination , Direction bt){
-
-        OnFloorPosition tempPosition = new OnFloorPosition(getActualPosition().getRow(),getActualPosition().getCol());
-        List<OnFloorPosition> road = new ArrayList<>();
-        BotDirection virtualDirection = new BotDirection(bt);
-
-        while(tempPosition.compareTo(destination)!=0){
-            road.add(tempPosition);
-
-            if(tempPosition.getRow()==destination.getRow() || tempPosition.getCol()==destination.getCol() || notThatWay(tempPosition,virtualDirection)){
-                Direction d =changeBotDirection(destination);
-                virtualDirection.changeDirection(d);
-            }
-            tempPosition.setOnFloorPosition(tempPosition.getRow()+virtualDirection.getY(),tempPosition.getCol()+virtualDirection.getX());
-        }
-
-        return road;
-    }
-
-    private boolean notThatWay(OnFloorPosition pos , BotDirection bt){
-        OnFloorPosition temp=new OnFloorPosition(pos.getRow(),pos.getCol());
-        temp.setOnFloorPosition(temp.getRow()+bt.getY(),temp.getCol()+bt.getY());
-
-        if((temp.getRow()<0 || temp.getRow()>=getWidth()) || (temp.getCol()<0 || temp.getCol()>= getHeight()))
-            return true;
-        return false;
-    }
-
-    public boolean freeRoad(List<OnFloorPosition> road , OnFloorPosition destination){
-        for(int i = 0 ;i<road.size() ; i++){
-            if(field[road.get(i).getRow()][road.get(i).getCol()].getMine() && road.get(i).compareTo(destination)!=0)
-                return false;
-        }
-        return true;
-    }
-
-    public List<OnFloorPosition> findRoad(OnFloorPosition destination){
-        List<OnFloorPosition> road = createVirtualRoad(destination,getBotDirection());
-        if(!freeRoad(road,destination)){
-            List<Direction> dir = new ArrayList<>();
-            dir.add(Direction.HORIZONTAL_DOWN); dir.add(Direction.HORIZONTAL_UP); dir.add(Direction.VERTICAL_DOWN); dir.add(Direction.VERTICAL_UP);
-            for(int i=0;i<dir.size();i++){
-                if(dir.get(i)!=getBotDirection()){
-                    road=createVirtualRoad(destination,dir.get(i));
-                }
-                if(freeRoad(road,destination)) break;
-            }
-        }
-        return road; //TODO SE NON C'E' STRADA  ME NE RITORNA UNA SBAGLIATA
-    }
 
 
-    private static class BotDirection{
+    public static class BotDirection{
         private int y = 0, x = 0; Direction direction;
-        private BotDirection(Direction d){
+        public BotDirection(Direction d){
             if(y==0 && x==0){
                 changeDirection(d);
             }

@@ -21,7 +21,7 @@ public class SensorMaster {
 
     public boolean objectInProximity() throws IOException, ExecutionException, InterruptedException {
         Float f =ultra.getDistance().get();
-        if(f<20)
+        if(f<6)
             return true;
         else return false;
     }

@@ -80,9 +80,9 @@ public class TachoMaster {
         leftMotor.setStepSpeed(speed,step1,step2,0,true);
         rightMotor.waitCompletion();
         leftMotor.waitCompletion();
-        leftMotor.waitUntilReady();
-        rightMotor.waitUntilReady();
-        stopMotors();
+       // leftMotor.waitUntilReady();
+        //rightMotor.waitUntilReady();
+        //stopMotors();
 
     }
 

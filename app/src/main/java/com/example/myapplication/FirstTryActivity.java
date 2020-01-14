@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import it.unive.dais.legodroid.lib.EV3;
 import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.gioUtil.Floor;
+import it.unive.dais.legodroid.lib.gioUtil.FloorMaster;
 import it.unive.dais.legodroid.lib.gioUtil.PrimaProva;
 import it.unive.dais.legodroid.lib.gioUtil.SensorMaster;
 import it.unive.dais.legodroid.lib.gioUtil.TachoMaster;
@@ -31,21 +32,22 @@ import it.unive.dais.legodroid.lib.util.Prelude;
 
 public class FirstTryActivity extends AppCompatActivity {
 
-    TachoMotor motorA , motorD , motorC;
-    TachoMaster tachoMaster ;
+    TachoMotor motorA, motorD, motorC;
+    TachoMaster tachoMaster;
+    FloorMaster floorMaster;
     Floor floor;
-    EV3 ev3 ;
+    EV3 ev3;
     UltrasonicSensor ultra;
     GyroSensor gyro;
 
-    SensorMaster sensorMaster ;
+    SensorMaster sensorMaster;
 
     LinearLayout ll;
 
-    int cnt=0,x=-1,y=-1;
+    int cnt = 0, x = -1, y = -1;
     EditText et1, et2;
 
-    Integer n,m;
+    Integer n, m;
 
 
     @Override
@@ -54,7 +56,7 @@ public class FirstTryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_first_try);
         //EV3 ev3 =getIntent().getExtras().getSerializable("EV3MCLOVIN"); /**TODO**/
 
-        Button startButtonFirst= findViewById(R.id.startButtonFirst);
+        Button startButtonFirst = findViewById(R.id.startButtonFirst);
         Button stopButtonFirst = findViewById(R.id.stopButtonFirst);
 
         et1 = findViewById(R.id.editText1);
@@ -62,7 +64,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
         try {
             BluetoothConnection.BluetoothChannel ch = new BluetoothConnection("EV3MCLOVIN").connect(); // replace with your own brick name
-            ev3=new EV3(ch);
+            ev3 = new EV3(ch);
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("FIRST TRY", "CANNOT connect to the fuckin lego");
@@ -81,23 +83,23 @@ public class FirstTryActivity extends AppCompatActivity {
             n = new Integer(s1);
             m = new Integer(s2);
 
-            creaMap(n,m,x,y);
+            creaMap(n, m, x, y);
 
-            Prelude.trap(() -> ev3.run(this::ev3Task4));
+            Prelude.trap(() -> ev3.run(this::ev3Task3));
         });
 
 
-        stopButtonFirst.setOnClickListener(v->ev3.cancel());
+        stopButtonFirst.setOnClickListener(v -> ev3.cancel());
 
     }
 
     /**************************************************************************************************************************/
-    public void creaMap(int n, int m, int x, int y){
-        for(int i=0;i<n;i++)
-            addButton(i,m,x,y);
+    public void creaMap(int n, int m, int x, int y) {
+        for (int i = 0; i < n; i++)
+            addButton(i, m, x, y);
     }
 
-    public void addButton(int n, int m, int x, int y){
+    public void addButton(int n, int m, int x, int y) {
         LinearLayout ll2 = new LinearLayout(this);
         ll2.setOrientation(LinearLayout.HORIZONTAL);
         LinearLayout.LayoutParams ll_params =
@@ -105,47 +107,93 @@ public class FirstTryActivity extends AppCompatActivity {
         ll2.setLayoutParams(ll_params);
         ll.addView(ll2);
 
-        for(int i=0;i<m;i++){
+        for (int i = 0; i < m; i++) {
             Button btn = new Button(this);
 
-            LinearLayout.LayoutParams b_params = new LinearLayout.LayoutParams(0, 100,1);
+            LinearLayout.LayoutParams b_params = new LinearLayout.LayoutParams(0, 100, 1);
             btn.setLayoutParams(b_params);
             ll2.addView(btn);
             btn.setId(cnt);
             cnt++;
 
-            if (n==x && i==y)
+            if (n == x && i == y)
                 btn.setBackgroundColor(Color.RED);
 
             final int x2 = i;
-            btn.setOnClickListener(v-> Toast.makeText(FirstTryActivity.this, "["+n+","+x2+"]", Toast.LENGTH_LONG).show());
+            btn.setOnClickListener(v -> Toast.makeText(FirstTryActivity.this, "[" + n + "," + x2 + "]", Toast.LENGTH_LONG).show());
         }
     }
 
-    public void setColorButton(int x, int y, Button btn){
-        int cnt=0;
-        for(int i=0;i<x;i++){
-            for(int j=0;j<y;j++){
+    public void setColorButton(int x, int y, Button btn) {
+        int cnt = 0;
+        for (int i = 0; i < x; i++) {
+            for (int j = 0; j < y; j++) {
                 cnt++;
             }
         }
         //btn.findViewById(R.id.cnt);
         btn.setBackgroundColor(Color.RED);
     }
+
     /**************************************************************************************************************************/
 
 
-    private void threadTest(EV3.Api api){
-        Thread a = new Thread(){
-            @Override
-            public void run(){
+    public void ev3Task5(EV3.Api api) {
+        motorA = api.getTachoMotor(EV3.OutputPort.A);
+        motorD = api.getTachoMotor(EV3.OutputPort.D);
+        motorC = api.getTachoMotor(EV3.OutputPort.C);
+        ultra = api.getUltrasonicSensor(EV3.InputPort._1);
+        gyro = api.getGyroSensor(EV3.InputPort._3);
 
+        sensorMaster = new SensorMaster(ultra, gyro);
+
+        tachoMaster = new TachoMaster(motorD, motorA, motorC);
+        boolean motorrs_going = false;
+
+        try {
+            while (!sensorMaster.objectInProximity()) {
+                if (!motorrs_going) {
+                    motorA.setSpeed(20);
+                    motorD.setSpeed(20);
+                    motorA.start();
+                    motorD.start();
+                    motorrs_going = true;
+                }
             }
-        };
-        a.start();
+            motorD.stop();
+            motorA.stop();
+            motorC.setSpeed(-20);
+            motorC.start();
+            Thread.sleep(4000);
+            motorC.stop();
+            motorrs_going = false;
+            motorC.setSpeed(0);
+            motorC.start();
+            motorD.setStepSpeed(20, 0, 500, 0, true);
+            motorA.setStepSpeed(20, 0, 500, 0, true);
+            motorA.waitCompletion();
+            motorD.waitCompletion();
+            motorD.setStepSpeed(20, 0, 500, 0, true);
+            motorA.setStepSpeed(-20, 0, 500, 0, true);
+            Thread.sleep(5000);
+            motorC.stop();
+
+
+        } catch (IOException | ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                motorD.stop();
+                motorA.stop();
+                motorC.stop();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
-    private void gyroTest(EV3.Api api){
+    private void gyroTest(EV3.Api api) {
         motorA = api.getTachoMotor(EV3.OutputPort.A);
         motorD = api.getTachoMotor(EV3.OutputPort.D);
         motorC = api.getTachoMotor(EV3.OutputPort.C);
@@ -156,13 +204,13 @@ public class FirstTryActivity extends AppCompatActivity {
 
         tachoMaster = new TachoMaster(motorD, motorA, motorC);
 
-        float init_angle , final_angle;
+        float init_angle, final_angle;
 
-        boolean motors_going=false;
-        try{
-            while(!ev3.isCancelled()){
+        boolean motors_going = false;
+        try {
+            while (!ev3.isCancelled()) {
                 init_angle = sensorMaster.getGyroAngle();
-                while((sensorMaster.getGyroAngle()-init_angle)<82) {
+                while ((sensorMaster.getGyroAngle() - init_angle) < 82) {
                     if (!motors_going) {
                         motorA.setSpeed(10);
                         motorD.setSpeed(-10);
@@ -171,16 +219,21 @@ public class FirstTryActivity extends AppCompatActivity {
                         motors_going = true;
                     }
                 }
-                Prelude.trap(()->{motorA.stop(); motorD.stop();});
-                motors_going=false;
-                Log.e("SENSOR MASTER = " , "ANGOLO = "+sensorMaster.getGyroAngle());
-                Log.e("SENSOR MASTER = ", "DIFFERENZA ANGOLI = "+Math.round(sensorMaster.getGyroAngle()-init_angle));
+                Prelude.trap(() -> {
+                    motorA.stop();
+                    motorD.stop();
+                });
+                motors_going = false;
+                Log.e("SENSOR MASTER = ", "ANGOLO = " + sensorMaster.getGyroAngle());
+                Log.e("SENSOR MASTER = ", "DIFFERENZA ANGOLI = " + Math.round(sensorMaster.getGyroAngle() - init_angle));
                 Thread.sleep(5000);
             }
-        }
-        catch(Exception e){}
-        finally{
-            Prelude.trap(()->{motorA.stop(); motorD.stop();});
+        } catch (Exception e) {
+        } finally {
+            Prelude.trap(() -> {
+                motorA.stop();
+                motorD.stop();
+            });
         }
     }
 
@@ -197,9 +250,11 @@ public class FirstTryActivity extends AppCompatActivity {
 
         floor = new Floor(n,m, 29.5f ,29.5f);
 
+        floorMaster = new FloorMaster(floor);
+
         List<Floor.OnFloorPosition> minePosition = new ArrayList<>(); //TODO /*da mettere globale??*/
 
-        PrimaProva test = new PrimaProva(getApplicationContext(), tachoMaster , floor  , sensorMaster);
+        PrimaProva test = new PrimaProva(getApplicationContext(), tachoMaster , floorMaster  , sensorMaster);
         int mine = 3 ;
         try {
             while (!ev3.isCancelled() && mine>0 ) {
@@ -222,272 +277,17 @@ public class FirstTryActivity extends AppCompatActivity {
             }
         }
         catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (Floor.AllPositionVisited allPositionVisited) {
-                allPositionVisited.printStackTrace();
-                Log.d("PRIMA PROVA : " , "Tutto il campo è stato visitato");
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (FloorMaster.AllPositionVisited allPositionVisited) {
+            allPositionVisited.printStackTrace();
+            Log.d("PRIMA PROVA : " , "Tutto il campo è stato visitato");
         } finally {
             Prelude.trap(()->tachoMaster.stopMotors());
         }
 
-    }
-
-
-    public void ev3Task4(EV3.Api api){
-        motorA=api.getTachoMotor(EV3.OutputPort.A);
-        motorD=api.getTachoMotor(EV3.OutputPort.D);
-        motorC=api.getTachoMotor(EV3.OutputPort.C);
-
-        tachoMaster = new TachoMaster(motorD,motorA,motorC);
-
-        ultra = api.getUltrasonicSensor(EV3.InputPort._1);
-        gyro = api.getGyroSensor(EV3.InputPort._3);
-
-        sensorMaster = new SensorMaster(ultra, gyro);
-
-        boolean motors_going=false;
-
-        try {
-            while (!sensorMaster.objectInProximity()) {
-                if(!motors_going){
-                    tachoMaster.moveStraight(20);
-                }
-            }
-            tachoMaster.stopMotors();
-            tachoMaster.moveStepstraight(20,0,50);
-            motorC.setSpeed(20);
-            motorC.start();
-            tachoMaster.turnNinetyRight(20,173);
-            tachoMaster.turnNinetyRight(20,173);
-            tachoMaster.moveStepstraight(20,0,200);
-
-        }
-        catch(Exception e ){}
-    }
-
-    public void ev3Task(EV3.Api api){
-        motorA=api.getTachoMotor(EV3.OutputPort.A);
-        motorD=api.getTachoMotor(EV3.OutputPort.D);
-        motorC=api.getTachoMotor(EV3.OutputPort.C);
-
-        tachoMaster = new TachoMaster(motorD,motorA,motorC);
-
-        int giri=0;
-
-        floor = new Floor(3, 3, 29.5f ,29.5f);
-        try{
-            while(giri<8) {
-                while ((floor.getNextPosition().getRow()>=0 &&floor.getNextPosition().getRow() < floor.getWidth() )
-                        && (floor.getNextPosition().getCol() < floor.getHeight() && floor.getNextPosition().getCol()>=0)) {
-                    Log.e("FLOOR" , "NEXT POSITION raw = "+floor.getNextPosition().getRow()+" col = "+floor.getNextPosition().getCol());
-
-                    tachoMaster.resetMovementMotorsPosition();
-                    tachoMaster.moveStepstraight(20, 0, 630);
-                    floor.updateBotPosition();
-                    // tachoMaster.getMotorsPosition();
-                }
-                //  floor.getNextPosition().setOnFloorPosition(floor.getActualPosition().getRaw(),floor.getActualPosition().getCol());
-                Floor.TurnDirection turnDirection = floor.chooseNextDirection();
-                floor.updateNextPosition();
-                tachoMaster.resetMovementMotorsPosition();
-                Log.e("FLOOR000000000000000" , "NEXT POSITION raw = "+floor.getNextPosition().getRow()+" col = "+floor.getNextPosition().getCol());
-                tachoMaster.getMotorsPosition();
-                switch(turnDirection){
-                    case TURN_LEFT:tachoMaster.turnNinetyLeft(20,173);break;
-                    case TURN_RIGHT:tachoMaster.turnNinetyRight(20,173);break;
-                }
-                giri++;
-            }
-        }
-        catch(IOException | ExecutionException | InterruptedException e){
-            Log.e("FIRST TRY : ","PROBLEMI COL MOVIMENTO");
-            e.printStackTrace();
-        }
-
-
-    }
-
-    public void ev3Task2(EV3.Api api) {
-        motorA = api.getTachoMotor(EV3.OutputPort.A);
-        motorD = api.getTachoMotor(EV3.OutputPort.D);
-        motorC = api.getTachoMotor(EV3.OutputPort.C);
-        ultra = api.getUltrasonicSensor(EV3.InputPort._1);
-
-        sensorMaster = new SensorMaster(ultra, gyro);
-
-        tachoMaster = new TachoMaster(motorD, motorA, motorC);
-
-        int mine = 1;
-
-        floor = new Floor(3, 3, 29.5f, 29.5f);
-
-        Test test = new Test(tachoMaster , floor  , sensorMaster);
-        try {
-            PrimaProva3(mine);
-        } catch (InterruptedException | IOException | ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void PrimaProva3(int mine) throws InterruptedException, ExecutionException, IOException {
-        boolean motors_going=false;
-        boolean nowhereToGo=true;
-        float initAngle , finalAngle;
-        List<Floor.OnFloorPosition> botMoves = new ArrayList<>();
-        Floor.OnFloorPosition newPosition = new Floor.OnFloorPosition(-1,-1); //TODO
-        Thread.sleep(3000);
-        while(mine>0){
-            botMoves.clear();
-
-            botMoves.add(floor.getStartPosition());
-
-            while(!sensorMaster.objectInProximity()){
-                /**devo anche salvarmi gli spostamenti che fa prima di trovare una pallina**/
-                if(nowhereToGo){
-
-                    boolean okAngle=false;
-
-                    Log.e("PRIMA PROVA 3 : ", "ACTUALPOSITION :  ROW : "+floor.getActualPosition().getRow()+" COL : "+floor.getActualPosition().getCol());
-
-                    tachoMaster.resetMovementMotorsPosition();
-
-
-
-                    /***questo può stare in una ausiliaria ..... qua deve scegliere il punto dove andare che varia da dovè o solo per riga o solo per colonna*/
-                    /**qui devo settare new Position*/
-                    try {
-                        newPosition = floor.chooseNextPosition(); /*se ho riga o colonna adiacenti da controllare vado fino in fondo
-                        altrimenti mi faccio restituire una nuova colonna a cui andare o riga*/
-                    } catch (Floor.AllPositionVisited allPositionVisited) {
-                        allPositionVisited.printStackTrace();
-                    }
-
-
-                    Log.e("PRIMA PROVA 3 : ", "POSIZIONE SCELTA -----> RIGA : "+newPosition.getRow()+" COLONNA : "+newPosition.getCol());
-
-
-                    /**************/
-                    Floor.Direction d = floor.changeBotDirection(newPosition);
-                    /**qua deve girarsi a dovere*/
-                    Floor.TurnDirection turn = floor.turnDirection(d);
-
-                    Log.e("PRIMA PROVA 3 : ", "TURN DIRECTION "+turn);
-                    tachoMaster.turnBot(10,183,turn);
-
-
-                    nowhereToGo=false;
-                }
-
-                if(!motors_going && floor.getActualPosition().compareTo(newPosition)!=0){
-                    Log.e("PRIMA PROVA 3 : ", "MOTORS GOING ");
-                    tachoMaster.resetMovementMotorsPosition();
-                    tachoMaster.moveStraight(20);
-                    motors_going=true;
-                }
-                if(tachoMaster.getMotorsCount()>630 && motors_going){  /** dovrei avere (grandezza della piastrella *20)+20*/
-                    Log.e("PRIMA PROVA 3 : ", "UPDATING POSITION");
-                    floor.updateBotPosition();
-                    floor.updateNextPosition();
-
-                    Log.e("PRIMA PROVA 3 : ", "ACTUALPOSITION :  ROW : "+floor.getActualPosition().getRow()+" COL : "+floor.getActualPosition().getCol());
-
-                    if(floor.getActualPosition().compareTo(newPosition)==0) {
-                        Log.e("PRIMA PROVA 3 : ", "STOPPING MOTORS");
-                        tachoMaster.stopMotors();
-                        motors_going = false;
-                        nowhereToGo = true;
-                        tachoMaster.countAdjustment(20, Math.round(tachoMaster.getMotorsCount()), 630);
-                        tachoMaster.resetMovementMotorsPosition();
-                        botMoves.add(new Floor.OnFloorPosition(floor.getActualPosition().getRow(), floor.getActualPosition().getCol()));
-                        Log.e("PRIMA PROVA 3 : ", "POSITION ADDED : " + botMoves.get(botMoves.size() - 1).getRow() + botMoves.get(botMoves.size() - 1).getCol());
-                    }
-                    tachoMaster.resetMovementMotorsPosition();
-
-                    /**PROBLEMA SE MI TROVO GIA' NELLA POSIZIONE SCELTA**/
-
-                }
-
-            }   /**CHIUSURA while(!sensorMaster.objectInProximity())**/
-            tachoMaster.stopMotors();
-            nowhereToGo=true;
-            motors_going=false;
-
-            /**raccolgo pallina*/
-
-            tachoMaster.takeMine(-20,3000);
-            tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
-            floor.updateBotPosition();
-            floor.updateNextPosition();
-            tachoMaster.takeMine(-20,2000);
-
-            Log.e("PRIMA PROVA 3 : ", "ACTUALPOSITION :  ROW : "+floor.getActualPosition().getRow()+" COL : "+floor.getActualPosition().getCol());
-
-
-            tachoMaster.resetMovementMotorsPosition();
-
-
-
-
-            /**faccio percorso inverso*/
-            int i = botMoves.size()-1;
-            Log.e("PRIMA PROVA 3 : ", "ARRAY : "+botMoves.get(botMoves.size()-1).getRow()+botMoves.get(botMoves.size()-1).getCol());
-            while(i>=0) {
-                if (nowhereToGo){
-                    boolean okAngle=false;
-                    newPosition = botMoves.get(i);
-                    Floor.Direction d = floor.changeBotDirection(botMoves.get(i));
-                    Floor.TurnDirection turn = floor.turnDirection(d);
-
-
-                    tachoMaster.turnBot(10,183,turn);
-
-
-
-
-                    Log.e("PRIMA PROVA 3 : ", "POSIZIONE SCELTA PERCORSO INVERSO-----> RIGA : "+botMoves.get(i).getRow()+" COLONNA : "+ botMoves.get(i).getCol());
-
-                    nowhereToGo=false;
-                }
-
-                if(!motors_going && floor.getActualPosition().compareTo(newPosition)!=0){
-                    tachoMaster.resetMovementMotorsPosition();
-                    tachoMaster.moveStraight(20);
-                    motors_going=true;
-                }
-                if(tachoMaster.getMotorsCount()>630 && motors_going){  /** dovrei avere (grandezza della piastrella *20)+20*/
-                    floor.updateBotPosition();
-                    floor.updateNextPosition();
-                    if(floor.getActualPosition().compareTo(newPosition)==0) {
-                        tachoMaster.stopMotors();
-                        motors_going=false;
-                        nowhereToGo=true;
-                        tachoMaster.countAdjustment(20, Math.round(tachoMaster.getMotorsCount()), 630);
-                        i--;
-                    }
-
-                    tachoMaster.resetMovementMotorsPosition();
-
-                    Log.e("PRIMA PROVA 3 : ", "ACTUALPOSITION :  ROW : "+floor.getActualPosition().getRow()+" COL : "+floor.getActualPosition().getCol());
-
-                }
-                /***TOGLIERE LA MOSSA**/
-            }
-
-            /**rilascio pallina*/
-
-
-
-            /**TODO: VEDERE SE LA DIREZIONE E' CORRETTA AFFINCHE' LA MINA VENGA RILASCIATA NELLA ZONA ADIBITA*/
-
-            tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),315);
-            tachoMaster.releaseMine(20,3000);
-            tachoMaster.countAdjustment(-20,315,Math.round(tachoMaster.getMotorsCount()));
-            mine--;
-        }
     }
 }
