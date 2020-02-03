@@ -19,11 +19,11 @@ public class DispatcherActivity extends AppCompatActivity {
 
         Intent testIntent   = new Intent(getBaseContext(), FirstTryActivity.class);
         Intent openCVIntent = new Intent(getBaseContext(), MainActivity.class);
-        Intent nearbyIntent = new Intent(getBaseContext(), NearbyActivity.class);
+        //Intent nearbyIntent = new Intent(getBaseContext(), Nearby.class);
 
         testButton.setOnClickListener(v->startActivity(testIntent));
         openCVButton.setOnClickListener(v->startActivity(openCVIntent));
-        nearbyButton.setOnClickListener(v->startActivity(nearbyIntent));
+        //nearbyButton.setOnClickListener(v->startActivity(nearbyIntent));
 
     }
 }

@@ -11,6 +11,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.nearby.Nearby;
+import com.google.android.gms.nearby.connection.ConnectionsClient;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +52,11 @@ public class FirstTryActivity extends AppCompatActivity {
 
     Integer n, m;
 
+    private ConnectionsClient connectionsClient;
+
+    public static String PACKAGE_NAME;
+
+    com.example.myapplication.Nearby nearby = new com.example.myapplication.Nearby();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +69,14 @@ public class FirstTryActivity extends AppCompatActivity {
 
         et1 = findViewById(R.id.editText1);
         et2 = findViewById(R.id.editText2);
+
+        PACKAGE_NAME = getApplicationContext().getPackageName();
+
+        connectionsClient = Nearby.getConnectionsClient(this);
+
+
+        nearby.startDiscovery();
+
 
         try {
             BluetoothConnection.BluetoothChannel ch = new BluetoothConnection("EV3MCLOVIN").connect(); // replace with your own brick name
@@ -86,6 +102,9 @@ public class FirstTryActivity extends AppCompatActivity {
             creaMap(n, m, x, y);
 
             Prelude.trap(() -> ev3.run(this::ev3Task3));
+
+
+
         });
 
 
@@ -137,6 +156,10 @@ public class FirstTryActivity extends AppCompatActivity {
 
     /**************************************************************************************************************************/
 
+
+    public List<String> getMines(){
+        return nearby.listCoordMines2;
+    }
 
     public void ev3Task5(EV3.Api api) {
         motorA = api.getTachoMotor(EV3.OutputPort.A);

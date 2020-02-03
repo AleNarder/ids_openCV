@@ -31,7 +31,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NearbyActivity"></activity>
+        <activity android:name=".Nearby"/>
         <activity android:name=".FirstTryActivity" />
         <activity android:name=".MainActivity" />
         <activity android:name=".DispatcherActivity">
