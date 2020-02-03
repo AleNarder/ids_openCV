@@ -34,7 +34,6 @@ import javax.crypto.spec.SecretKeySpec;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class Nearby {
-
     private static final String TAG  = "ProvaCryptoNearby";
     private static final String TAG1 = "PAYLOAD";
 
@@ -72,6 +71,11 @@ public class Nearby {
 
     public String packageName = FirstTryActivity.PACKAGE_NAME;
 
+
+
+    public Nearby(ConnectionsClient cc){
+        connectionsClient = cc;
+    }
     /** Step 1: Advertise and Discover ******************************************************************************************************/
 
     public void startAdvertising() {
@@ -144,7 +148,6 @@ public class Nearby {
                     Log.e(TAG, "onDisconnected: disconnected from the opponent");
                 }
             };
-
     /** Step 3: Exchange Data ***************************************************************************************************************/
 
     /**

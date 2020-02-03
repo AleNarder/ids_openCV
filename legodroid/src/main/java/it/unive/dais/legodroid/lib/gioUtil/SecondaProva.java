@@ -158,7 +158,7 @@ public class SecondaProva {
         boolean nowhereToGo=true;
         int i = botMoves.size()-1;
         Floor.OnFloorPosition newPosition = new Floor.OnFloorPosition(-1,-1); //TODO
-        Log.e("PRIMA PROVA 3 : ", "ARRAY : "+botMoves.get(botMoves.size()-1).getRow()+botMoves.get(botMoves.size()-1).getCol());
+        Log.e("SECONDA PROVA 3 : ", "ARRAY : "+botMoves.get(botMoves.size()-1).getRow()+botMoves.get(botMoves.size()-1).getCol());
         while(i>=0) {
             if (nowhereToGo){
 

@@ -13,6 +13,13 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/discoveryButton"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="discovery"/>
+
+        <Button
             android:id="@+id/startButtonFirst"
             android:layout_width="0dp"
             android:layout_weight="1"
