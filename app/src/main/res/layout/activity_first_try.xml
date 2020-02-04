@@ -3,8 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:opencv="http://schemas.android.com/apk/res-auto"
     android:padding="10dp"
     android:orientation="vertical">
+
+
+    <org.opencv.android.JavaCameraView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone"
+        android:id="@+id/OpenCvView"
+        opencv:show_fps="true"
+        opencv:camera_id="any" />
 
     <LinearLayout
         android:id="@+id/linearlayout1"

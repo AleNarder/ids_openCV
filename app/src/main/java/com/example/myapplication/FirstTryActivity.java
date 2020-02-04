@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,6 +48,11 @@ import com.example.myapplication.gioUtil.PrimaProva;
 import com.example.myapplication.gioUtil.SensorMaster;
 import com.example.myapplication.gioUtil.TachoMaster;
 
+import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Mat;
+
+import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
 import it.unive.dais.legodroid.lib.plugs.TachoMotor;
 import it.unive.dais.legodroid.lib.plugs.UltrasonicSensor;
@@ -117,21 +123,28 @@ public class FirstTryActivity extends AppCompatActivity {
     Integer n, m;
     public static String PACKAGE_NAME;
 
-
+    private CameraBridgeViewBase mOpenCvCameraView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_first_try);
-        //EV3 ev3 =getIntent().getExtras().getSerializable("EV3MCLOVIN"); /**TODO**/
 
         Button startButtonFirst = findViewById(R.id.startButtonFirst);
         Button stopButtonFirst = findViewById(R.id.stopButtonFirst);
         Button discButton = findViewById(R.id.discoveryButton);
 
+
+        if (!OpenCVLoader.initDebug()) {
+            Log.e("AndroidIngSwOpenCV", "Unable to load OpenCV");
+        } else {
+            Log.d("AndroidIngSwOpenCV", "OpenCV loaded");
+        }
+
+
         et1 = findViewById(R.id.editText1);
         et2 = findViewById(R.id.editText2);
-
+/*
         PACKAGE_NAME = getApplicationContext().getPackageName();
 
         connectionsClient = Nearby.getConnectionsClient(this);
@@ -140,10 +153,12 @@ public class FirstTryActivity extends AppCompatActivity {
             Toast.makeText(this, "ERRORE", Toast.LENGTH_SHORT).show();
 
 
-        discButton.setOnClickListener(v -> startDiscovery());
+        discButton.setOnClickListener(v -> startDiscovery());*/
         //nearby.startDiscovery();
-
-        /*try {
+       // mOpenCvCameraView = findViewById(R.id.OpenCvView);
+        /*mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
+        mOpenCvCameraView.setMaxFrameSize(640, 480);*/
+        try {
             BluetoothConnection.BluetoothChannel ch = new BluetoothConnection("EV3MCLOVIN").connect(); // replace with your own brick name
             ev3 = new EV3(ch);
         } catch (IOException e) {
@@ -152,19 +167,19 @@ public class FirstTryActivity extends AppCompatActivity {
         }
 
         startButtonFirst.setOnClickListener(v -> {
-            setContentView(R.layout.activity_map);
+            /*setContentView(R.layout.activity_map);
 
             Button stopButton2 = findViewById(R.id.stopButton2);
             stopButton2.setOnClickListener(v2 -> ev3.cancel());
 
-            ll = findViewById(R.id.linearlayout0);
+            ll = findViewById(R.id.linearlayout0);*/
 
             String s1 = et1.getText().toString();
             String s2 = et2.getText().toString();
             n = new Integer(s1);
             m = new Integer(s2);
 
-            creaMap(n, m, x, y);
+            //creaMap(n, m, x, y);
 
             Prelude.trap(() -> ev3.run(this::ev3Task3));
 
@@ -174,7 +189,39 @@ public class FirstTryActivity extends AppCompatActivity {
 
 
         stopButtonFirst.setOnClickListener(v -> ev3.cancel());
-        */
+
+
+
+
+        //mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
+        mOpenCvCameraView.setMaxFrameSize(640, 480);
+        mOpenCvCameraView.setCvCameraViewListener(new CameraBridgeViewBase.CvCameraViewListener2() {
+            @Override
+            public void onCameraViewStarted(int width, int height) {
+
+            }
+
+            @Override
+            public void onCameraViewStopped() {
+
+            }
+
+            @Override
+            public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+                Mat frame = inputFrame.rgba();
+                LineFinder lineFinder = new LineFinder(frame, true);
+                lineFinder.setThreshold(300, 20);;
+                lineFinder.setOrientation("landscape");
+                double inclination = lineFinder.findLine();
+
+                if (!Double.isNaN(inclination)) {
+                    Log.e("Line inclination", String.valueOf(inclination));
+                }
+                return frame;
+            }
+        });
+
+        mOpenCvCameraView.enableView();
     }
 
 
@@ -599,7 +646,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
         List<Floor.OnFloorPosition> minePosition = new ArrayList<>(); //TODO /*da mettere globale??*/
 
-        PrimaProva test = new PrimaProva(getApplicationContext(), tachoMaster , floorMaster  , sensorMaster);
+        PrimaProva test = new PrimaProva(getApplicationContext(), tachoMaster , floorMaster  , sensorMaster , this);
         int mine = 3 ;
         try {
             while (!ev3.isCancelled() && mine>0 ) {

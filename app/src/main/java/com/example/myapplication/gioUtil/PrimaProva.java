@@ -1,11 +1,20 @@
 package com.example.myapplication.gioUtil;
 
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
+import android.view.SurfaceView;
+
+import com.example.myapplication.LineFinder;
+import com.example.myapplication.R;
+
+import org.opencv.android.CameraBridgeViewBase;
+import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Mat;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,6 +34,8 @@ public class PrimaProva {
     private Sensor smartphone_gyro;
     private Float angle_checker;
 
+    double inclination;
+
 
     /** in questo array vengono salvate le posizioni chiave(quelle ottenute tramite choose next direction)
      * Serviranno per fare il percorso inverso non appena trovata una mina se nessun altro percorso risulti
@@ -32,12 +43,15 @@ public class PrimaProva {
 
     List<Floor.OnFloorPosition> botMoves;
 
+    private CameraBridgeViewBase mOpenCvCameraView;
+
     /****************************/
 
-    public PrimaProva(Context context , TachoMaster tachoMaster , FloorMaster floorMaster , SensorMaster sensorMaster){
+    public PrimaProva(Context context , TachoMaster tachoMaster , FloorMaster floorMaster , SensorMaster sensorMaster , Activity act){
         this.tachoMaster=tachoMaster;
         this.floorMaster=floorMaster;
         this.sensorMaster=sensorMaster;
+       // this.act = act
         botMoves=new ArrayList<>();
         tileDim = Math.round(floorMaster.getFloor().getTileWidth()*20+20); /**è la dimensione in step per i motori**/
 
@@ -56,6 +70,7 @@ public class PrimaProva {
             }
         };
         sensorManager.registerListener(sensorListener, smartphone_gyro , sensorManager.SENSOR_DELAY_FASTEST);
+
     }
 
     public void findMine() throws InterruptedException, ExecutionException, IOException, FloorMaster.AllPositionVisited {
