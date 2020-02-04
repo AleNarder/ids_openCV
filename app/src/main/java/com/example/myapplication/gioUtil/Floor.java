@@ -1,6 +1,4 @@
-package it.unive.dais.legodroid.lib.gioUtil;
-
-import android.util.Log;
+package com.example.myapplication.gioUtil;
 
 import java.util.ArrayList;
 import java.util.List;

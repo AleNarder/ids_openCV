@@ -1,10 +1,9 @@
-package it.unive.dais.legodroid.lib.gioUtil;
+package com.example.myapplication.gioUtil;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
-import it.unive.dais.legodroid.lib.plugs.TouchSensor;
 import it.unive.dais.legodroid.lib.plugs.UltrasonicSensor;
 
 public class SensorMaster {

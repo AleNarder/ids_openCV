@@ -1,4 +1,4 @@
-package it.unive.dais.legodroid.lib.gioUtil;
+package com.example.myapplication.gioUtil;
 
 import android.util.Log;
 
@@ -9,9 +9,9 @@ import java.util.concurrent.ExecutionException;
 
 import it.unive.dais.legodroid.lib.plugs.TachoMotor;
 
-import static it.unive.dais.legodroid.lib.gioUtil.Floor.TurnDirection.TURN_LEFT;
-import static it.unive.dais.legodroid.lib.gioUtil.Floor.TurnDirection.TURN_RIGHT;
-import static it.unive.dais.legodroid.lib.gioUtil.Floor.TurnDirection.U_INVERSION;
+import static com.example.myapplication.gioUtil.Floor.TurnDirection.TURN_LEFT;
+import static com.example.myapplication.gioUtil.Floor.TurnDirection.TURN_RIGHT;
+import static com.example.myapplication.gioUtil.Floor.TurnDirection.U_INVERSION;
 
 public class TachoMaster {
     @Nullable

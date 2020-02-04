@@ -1,11 +1,10 @@
-package it.unive.dais.legodroid.lib.gioUtil;
+package com.example.myapplication.gioUtil;
 
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.service.quicksettings.Tile;
 import android.util.Log;
 
 import java.io.IOException;

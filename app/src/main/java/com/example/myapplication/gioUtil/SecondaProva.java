@@ -1,4 +1,4 @@
-package it.unive.dais.legodroid.lib.gioUtil;
+package com.example.myapplication.gioUtil;
 
 import android.content.Context;
 import android.hardware.Sensor;
