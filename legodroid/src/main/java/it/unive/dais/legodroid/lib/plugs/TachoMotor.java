@@ -236,7 +236,7 @@ public class TachoMotor extends Plug<EV3.OutputPort> implements AutoCloseable {
          * @return the type as a byte-sized constant.
          */
         public byte toByte() {
-            switch (this) {     
+            switch (this) {
                 case MEDIUM:
                     return Const.M_MOTOR;
                 case LARGE:

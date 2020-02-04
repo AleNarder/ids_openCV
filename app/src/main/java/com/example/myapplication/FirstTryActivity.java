@@ -30,7 +30,7 @@ import com.google.android.gms.nearby.connection.Strategy;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.List;    
 import java.util.concurrent.ExecutionException;
 
 import javax.crypto.Cipher;
