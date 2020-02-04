@@ -40,15 +40,14 @@ import javax.crypto.spec.DESKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import it.unive.dais.legodroid.lib.EV3;
-import it.unive.dais.legodroid.lib.comm.BluetoothConnection;
-import it.unive.dais.legodroid.lib.gioUtil.Floor;
-import it.unive.dais.legodroid.lib.gioUtil.FloorMaster;
-import it.unive.dais.legodroid.lib.gioUtil.PrimaProva;
-import it.unive.dais.legodroid.lib.gioUtil.SensorMaster;
-import it.unive.dais.legodroid.lib.gioUtil.TachoMaster;
-import it.unive.dais.legodroid.lib.gioUtil.Test;
+
+import com.example.myapplication.gioUtil.Floor;
+import com.example.myapplication.gioUtil.FloorMaster;
+import com.example.myapplication.gioUtil.PrimaProva;
+import com.example.myapplication.gioUtil.SensorMaster;
+import com.example.myapplication.gioUtil.TachoMaster;
+
 import it.unive.dais.legodroid.lib.plugs.GyroSensor;
-import it.unive.dais.legodroid.lib.plugs.LightSensor;
 import it.unive.dais.legodroid.lib.plugs.TachoMotor;
 import it.unive.dais.legodroid.lib.plugs.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Prelude;
