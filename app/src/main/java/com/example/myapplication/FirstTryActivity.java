@@ -30,7 +30,7 @@ import com.google.android.gms.nearby.connection.Strategy;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;    
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.crypto.Cipher;
@@ -57,7 +57,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class FirstTryActivity extends AppCompatActivity {
 
-
+    /**** CIAO FISTA**/
     /*** NEARBY VAR**************************************************************************************************************/
 
     private static final String TAG  = "ProvaCryptoNearby";
