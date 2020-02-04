@@ -34,4 +34,5 @@ dependencies {
     implementation project(path: ':openCVLibrary345')
     implementation project(path: ':legodroid')
     implementation 'com.google.android.gms:play-services:12.0.1'
+    implementation 'com.quickbirdstudios:opencv:4.1.0'
 }

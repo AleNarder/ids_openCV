@@ -234,9 +234,9 @@ public class FirstTryActivity extends AppCompatActivity {
     public void startDiscovery() {
         Log.e(TAG,"discovery");
         DiscoveryOptions discoveryOptions = new DiscoveryOptions.Builder().setStrategy(STRATEGY).build();
-        //connectionsClient.startDiscovery(SERVICE_ID, endpointDiscoveryCallback, discoveryOptions); //per comunicare con GroundStaion
+        connectionsClient.startDiscovery(SERVICE_ID, endpointDiscoveryCallback, discoveryOptions); //per comunicare con GroundStaion
 
-        connectionsClient.startDiscovery(packageName, endpointDiscoveryCallback, discoveryOptions); //per comunicare con altri
+       // connectionsClient.startDiscovery(packageName, endpointDiscoveryCallback, discoveryOptions); //per comunicare con altri
     }
 
     /** Step 2: Manage Connection ***********************************************************************************************************/
