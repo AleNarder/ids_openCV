@@ -108,12 +108,12 @@ public class TachoMaster {
     }
 
     public void turn(int speed , TachoMotor m1 , TachoMotor m2,int step) throws IOException, ExecutionException, InterruptedException {
-        m1.setStepSpeed(speed,0,step,0,true);
-        m2.setStepSpeed(-speed,0,step,0,true);
-       // m1.waitCompletion();
-       //id m2.waitCompletion();
-        m1.waitUntilReady();
-        m2.waitUntilReady();
+        m1.setStepSpeed(speed,step,0,0,true);
+        m2.setStepSpeed(-speed,step,0,0,true);
+        m1.waitCompletion();
+        m2.waitCompletion();
+       // m1.waitUntilReady();
+       // m2.waitUntilReady();
 
     }
 
@@ -128,9 +128,9 @@ public class TachoMaster {
         boolean motors_going = false;
         float tmp;
         float init_angle=sensorMaster.getGyroAngle();
-        Log.e("TACHOMASTER : " , "INIT ANGLE = "+init_angle);
+       // Log.e("TACHOMASTER : " , "INIT ANGLE = "+init_angle);
         while(Math.abs((tmp=sensorMaster.getGyroAngle())-init_angle)<80){
-            Log.e("TACHOMASTER : " , "ANGLE VARIATION = "+tmp);
+           // Log.e("TACHOMASTER : " , "ANGLE VARIATION = "+tmp);
             if(!motors_going){
                 rightMotor.setSpeed(-speed);
                 leftMotor.setSpeed(speed);
@@ -140,7 +140,7 @@ public class TachoMaster {
             }
 
         }
-        Log.e("SENSOR MASTER = ", "DIFFERENZA ANGOLI = "+Math.round(sensorMaster.getGyroAngle()-init_angle));
+        //Log.e("SENSOR MASTER = ", "DIFFERENZA ANGOLI = "+Math.round(sensorMaster.getGyroAngle()-init_angle));
 
         rightMotor.stop();
         leftMotor.stop();
@@ -150,9 +150,9 @@ public class TachoMaster {
         boolean motors_going = false;
         float tmp;
         float init_angle=sensorMaster.getGyroAngle();
-        Log.e("TACHOMASTER : " , "INIT ANGLE = "+init_angle);
+       // Log.e("TACHOMASTER : " , "INIT ANGLE = "+init_angle);
         while(Math.abs(init_angle-(tmp=sensorMaster.getGyroAngle()))<80){ //TODO
-            Log.e("TACHOMASTER : " , "ANGLE VARIATION = "+tmp);
+           // Log.e("TACHOMASTER : " , "ANGLE VARIATION = "+tmp);
             if(!motors_going){
                 rightMotor.setSpeed(speed);
                 leftMotor.setSpeed(-speed);
@@ -162,7 +162,7 @@ public class TachoMaster {
             }
 
         }
-        Log.e("SENSOR MASTER = ", "DIFFERENZA ANGOLI = "+Math.round(init_angle-sensorMaster.getGyroAngle()));
+       // Log.e("SENSOR MASTER = ", "DIFFERENZA ANGOLI = "+Math.round(init_angle-sensorMaster.getGyroAngle()));
         rightMotor.stop();
         leftMotor.stop();
     }
@@ -216,8 +216,8 @@ public class TachoMaster {
         Thread.sleep(1000);
     }
 
-    public void turnBot(int speed , Floor.TurnDirection turn , SensorMaster sensorMaster) throws InterruptedException, ExecutionException, IOException {
-        Thread.sleep(2000);
+    public void turnBot(int speed , Floor.TurnDirection turn , SensorMaster sensorMaster , double inclination) throws InterruptedException, ExecutionException, IOException {
+        //Thread.sleep(2000);
         switch(turn){
             case TURN_RIGHT:
                 turnNinetyRight(speed,sensorMaster);
@@ -229,7 +229,28 @@ public class TachoMaster {
                 uInversionTurn(speed,sensorMaster);
                 break;
         }
-        Thread.sleep(1000);
+
+
+        /*if(inclination!=Double.NaN){
+
+            if(inclination<89.7) {
+                //  Log.e("TACHOMASTER", "Turn left inclination");
+                turn(10,rightMotor,leftMotor,5);
+            }
+            else
+            if(inclination>90.7) {
+                //  Log.e("TACHOMASTER", "Turn right inclination");
+                turn(10,leftMotor,rightMotor,5);
+
+
+            }
+
+        }*/
+
+        Thread.sleep(1500);
+
+
+
     }
 
     public void countAdjustment(int speed , int actualStep , int finalStep) throws InterruptedException, ExecutionException, IOException {
@@ -294,5 +315,41 @@ public class TachoMaster {
 
         }
         return okAngle;
+    }
+
+    public void inclinationAdjustment(int i, double inclination) throws InterruptedException, ExecutionException, IOException {
+        Log.e("TACHOMASTER","inclinazione="+inclination);
+        if(inclination!=Double.NaN){
+            if(inclination<88.0) {
+                Log.e("TACHOMASTER", "Turn left inclination");
+                turn(10, rightMotor, leftMotor, 5);
+            }
+            else
+                if(inclination>92) {
+                    Log.e("TACHOMASTER", "Turn right inclination");
+
+                    turn(10, leftMotor, rightMotor, 5);
+                }
+
+        }
+    }
+
+    public void moduleSpeed(int speed, double inclination) throws IOException {
+        Log.e("TACHOMASTER","inclinazione="+inclination);
+        if(inclination!=Double.NaN){
+            if(inclination<89.5) {
+              //  Log.e("TACHOMASTER", "Turn left inclination");
+                rightMotor.setSpeed(20+1);
+                leftMotor.setSpeed(20);
+            }
+            else
+            if(inclination>90.5) {
+              //  Log.e("TACHOMASTER", "Turn right inclination");
+                rightMotor.setSpeed(20);
+                leftMotor.setSpeed(20+1);
+
+            }
+
+        }
     }
 }

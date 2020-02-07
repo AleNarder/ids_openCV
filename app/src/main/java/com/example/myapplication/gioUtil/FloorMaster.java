@@ -257,6 +257,66 @@ public class FloorMaster {
     public void updateBotPosition(){floor.updateBotPosition();}
     public void updateNextPosition(){floor.updateNextPosition();}
 
+    public boolean rowVisitedInv(Floor.OnFloorPosition source , Floor.OnFloorPosition destination ){
+        if(source.compareTo(destination)==0)
+            return true;
+        Floor.OnFloorPosition actualPosition , finalPosition;
+        if(source.getRow()<destination.getRow()){
+            actualPosition=new Floor.OnFloorPosition(source);
+            finalPosition= new Floor.OnFloorPosition(destination);
+        }
+        else{
+            actualPosition=new Floor.OnFloorPosition(destination);
+            finalPosition=new Floor.OnFloorPosition(source);
+        }
 
-    public static class AllPositionVisited extends Exception{}
+        while(actualPosition.getRow()<finalPosition.getRow()){
+            if(!floor.getChecked(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                return false;
+            actualPosition.setOnFloorPosition(actualPosition.getRow()+1,actualPosition.getCol());
+        }
+        return colVisitedInv(actualPosition,finalPosition);
+    }
+
+    private boolean colVisitedInv(Floor.OnFloorPosition source, Floor.OnFloorPosition destination) {
+        if(source.compareTo(destination)==0)
+            return true;
+        Floor.OnFloorPosition actualPosition , finalPosition;
+        if(source.getCol()<destination.getCol()){
+            actualPosition=new Floor.OnFloorPosition(source);
+            finalPosition= new Floor.OnFloorPosition(destination);
+        }
+        else{
+            actualPosition=new Floor.OnFloorPosition(destination);
+            finalPosition=new Floor.OnFloorPosition(source);
+        }
+        while(actualPosition.getCol()<finalPosition.getCol()){
+            if(!floor.getChecked(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                return false;
+            actualPosition.setOnFloorPosition(actualPosition.getRow(),actualPosition.getCol()+1);
+        }
+        return rowVisitedInv(actualPosition,finalPosition);
+    }
+
+    public Floor.OnFloorPosition chooseNextPositionInv (Floor.OnFloorPosition destination)  {
+        if(floor.getActualPosition().compareTo(destination)!=0){
+            if(floor.getActualPosition().getRow()!=destination.getRow()){
+                if(rowVisitedInv(floor.getActualPosition(),destination)){  //TODO per riga e colonna
+                    return new Floor.OnFloorPosition(destination.getRow(),floor.getActualPosition().getCol());
+                }
+            }
+            else{
+                if(floor.getActualPosition().getCol()!=destination.getCol()){
+                    if(colVisitedInv(floor.getActualPosition(),destination)){
+                        return new Floor.OnFloorPosition(floor.getActualPosition().getRow(),destination.getCol());
+                    }
+                }
+            }
+            return null;
+        }
+        else
+            return destination;
+    }
+
+    public static class AllPositionVisited extends Exception{} //TODO : printstack
 }

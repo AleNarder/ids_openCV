@@ -114,7 +114,7 @@ public class LineFinder {
             }
 
             Imgproc.line(frame, p1, p2, new Scalar(0, 255, 0), 2);
-            Imgproc.line(frame, p3, p4, new Scalar(0, 255, 0), 2);
+            Imgproc.line(frame, p3, p4, new Scalar(255, 0, 0), 2);
         }
 
         return getLine(frame, lines);

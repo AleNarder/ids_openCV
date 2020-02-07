@@ -42,6 +42,7 @@ public class SecondaProva {
 
     Queue<Floor.OnFloorPosition> minePosition; /**lista posizioni mine da raccogliere**/
 
+    //TODO aggiungere il camera listener + sistemare algoritmo con gli adjust. aggiustare anche appena dopo aver girato?
     public SecondaProva(Context context , TachoMaster tachoMaster , FloorMaster floorMaster , SensorMaster sensorMaster , Queue<Floor.OnFloorPosition> minePosition){
         this.tachoMaster=tachoMaster;
         this.floorMaster=floorMaster;
@@ -89,7 +90,7 @@ public class SecondaProva {
 
 
                 //tachoMaster.turnBot(10, 163, turn);
-                tachoMaster.turnBot(10, turn, sensorMaster);
+                tachoMaster.turnBot(10, turn, sensorMaster,20.0);
             }
 
             if (!motors_going && floorMaster.getFloor().getActualPosition().compareTo(newPosition) != 0) {
@@ -142,7 +143,7 @@ public class SecondaProva {
         floorMaster.updateBotPosition();
         floorMaster.updateNextPosition();
         //tachoMaster.takeMine(-20,2000);
-        tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster);
+        tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster,20.0);
 
         Log.e("PRIMA PROVA 3 : ", "ACTUALPOSITION :  ROW : "+floorMaster.getFloor().getActualPosition().getRow()+" COL : "+floorMaster.getFloor().getActualPosition().getCol());
 
@@ -167,7 +168,7 @@ public class SecondaProva {
                 Floor.TurnDirection turn = floorMaster.turnDirection(d);
 
                 //tachoMaster.turnBot(10,163,turn);
-                tachoMaster.turnBot(10,turn,sensorMaster);
+                tachoMaster.turnBot(10,turn,sensorMaster,20.0);
 
 
 

@@ -31,7 +31,10 @@ import com.google.android.gms.nearby.connection.Strategy;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 
 import javax.crypto.Cipher;
@@ -65,7 +68,7 @@ public class FirstTryActivity extends AppCompatActivity {
     /**** CIAO FISTA**/
     /*** NEARBY VAR**************************************************************************************************************/
 
-    private static final String TAG  = "ProvaCryptoNearby";
+    /*private static final String TAG  = "ProvaCryptoNearby";
     private static final String TAG1 = "PAYLOAD";
 
     private static final Strategy STRATEGY = Strategy.P2P_STAR;
@@ -86,6 +89,46 @@ public class FirstTryActivity extends AppCompatActivity {
 
     TextView tv1;
 
+
+    private String welcome = "Benvenuto sono "+deviceA;
+    private String target = "Coordinate obiettivo:Coordinata_X;Coordinata_Y";
+
+        private String takingMine = "Operazione in corso:x;y;";
+    private String abortMine  = "Operazione annullata:x;y;";
+    private String takeMine   = "Operazione completata:x;y;";
+
+    private static final String SERVICE_ID = "it.unive.dais.nearby.apps.SERVICE_ID";
+
+    private String KEY = "abcdefgh";
+
+
+    public String packageName = FirstTryActivity.PACKAGE_NAME;*/
+
+
+    private static final String TAG  = "NEARBY";
+    private static final String TAG1 = "PAYLOAD";
+
+    private static final Strategy STRATEGY = Strategy.P2P_STAR;
+    private ConnectionsClient connectionsClient;
+
+    private String deviceA = "EV3MCLOVIN";
+    private String deviceB = "GroundStation";
+    private String deviceBEndpointId;
+    private EditText et1, et2, et3, et4;
+    private TextView tv1, tv2;
+    private String PayloadSent, chiave, id;
+
+    public static List<String> listCoordMines2 = new ArrayList<>();
+    public static List<String> MyMex = new ArrayList<>();
+    //public static List<String> MotionStop = new ArrayList<>();
+    public static Queue<String> MyMotionStop = new ConcurrentLinkedQueue<>();
+
+    private static final String SERVICE_ID = "it.unive.dais.nearby.apps.SERVICE_ID";
+
+    public static String PACKAGE_NAME;
+
+    public String packageName = FirstTryActivity.PACKAGE_NAME;
+
     /** PLAINTEXT */
     private String welcome = "Benvenuto sono "+deviceA;
     private String target = "Coordinate obiettivo:Coordinata_X;Coordinata_Y";
@@ -95,12 +138,10 @@ public class FirstTryActivity extends AppCompatActivity {
     private String abortMine  = "Operazione annullata:x;y;";
     private String takeMine   = "Operazione completata:x;y;";
 
-    private static final String SERVICE_ID = "it.unive.dais.nearby.apps.SERVICE_ID";
-
     private String KEY = "abcdefgh";
 
+    MyCameraListener cameraListener;
 
-    public String packageName = FirstTryActivity.PACKAGE_NAME;
 
 
     /*******************************************************************************************************************************/
@@ -120,10 +161,11 @@ public class FirstTryActivity extends AppCompatActivity {
     int cnt = 0, x = -1, y = -1;
 //    EditText et1, et2;
 
-    Integer n, m;
-    public static String PACKAGE_NAME;
+    Integer n=7, m=7;
+    //public static String PACKAGE_NAME;
 
     private CameraBridgeViewBase mOpenCvCameraView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +175,55 @@ public class FirstTryActivity extends AppCompatActivity {
         Button startButtonFirst = findViewById(R.id.startButtonFirst);
         Button stopButtonFirst = findViewById(R.id.stopButtonFirst);
         Button discButton = findViewById(R.id.discoveryButton);
+        Button disconnectButton = findViewById(R.id.disconnectButton);
+        Button showMex = findViewById(R.id.button5);
+        Button sendButton = findViewById(R.id.sendButton);
+
+        et1 = findViewById(R.id.editText1);
+        et2 = findViewById(R.id.editText2);
+        et3 = findViewById(R.id.key);
+        et4 = findViewById(R.id.idRobot);
+
+        tv1 = findViewById(R.id.statoConnesione);
+        tv2 = findViewById(R.id.messages);
+
+        //PACKAGE_NAME = getApplicationContext().getPackageName(); //non mi serve più
+
+        connectionsClient = Nearby.getConnectionsClient(this);
+
+        if (connectionsClient == null)
+            Toast.makeText(this, "ERRORE", Toast.LENGTH_SHORT).show();
+
+
+        discButton.setOnClickListener(v -> {
+            chiave = et3.getText().toString();
+            id = et4.getText().toString();
+            Log.e(TAG, "sono il robot: "+id);
+            Log.e(TAG, "chiave: " +chiave);
+            startDiscovery();
+        });
+
+        showMex.setOnClickListener(v -> tv2.setText(listCoordMines2.toString()));
+
+        disconnectButton.setOnClickListener(v -> {
+            connectionsClient.stopDiscovery();
+            connectionsClient.stopAdvertising();
+            connectionsClient.stopAllEndpoints();
+            tv1.setText("non connesso");
+            tv1.setTextColor(Color.RED);
+        });
+
+        sendButton.setOnClickListener(v ->
+        {
+            sendMyPayLoad(welcome);
+            /*try{
+               sendMyCryptoPayLoad("Operazione in corso:4;8;", chiave);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }*/
+        });
+
+
 
 
         if (!OpenCVLoader.initDebug()) {
@@ -142,8 +233,6 @@ public class FirstTryActivity extends AppCompatActivity {
         }
 
 
-        et1 = findViewById(R.id.editText1);
-        et2 = findViewById(R.id.editText2);
 /*
         PACKAGE_NAME = getApplicationContext().getPackageName();
 
@@ -155,7 +244,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
         discButton.setOnClickListener(v -> startDiscovery());*/
         //nearby.startDiscovery();
-       // mOpenCvCameraView = findViewById(R.id.OpenCvView);
+        mOpenCvCameraView = findViewById(R.id.OpenCvView);
         /*mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setMaxFrameSize(640, 480);*/
         try {
@@ -165,7 +254,6 @@ public class FirstTryActivity extends AppCompatActivity {
             e.printStackTrace();
             Log.e("FIRST TRY", "CANNOT connect to the fuckin lego");
         }
-
         startButtonFirst.setOnClickListener(v -> {
             /*setContentView(R.layout.activity_map);
 
@@ -173,11 +261,19 @@ public class FirstTryActivity extends AppCompatActivity {
             stopButton2.setOnClickListener(v2 -> ev3.cancel());
 
             ll = findViewById(R.id.linearlayout0);*/
+            mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
+            mOpenCvCameraView.setMaxFrameSize(320, 240);
+            cameraListener = new MyCameraListener();
+            mOpenCvCameraView.setCvCameraViewListener(cameraListener);
+
+            mOpenCvCameraView.enableView();
+
+            Log.e("FIRST :","Camera active");
 
             String s1 = et1.getText().toString();
             String s2 = et2.getText().toString();
-            n = new Integer(s1);
-            m = new Integer(s2);
+            //n = new Integer(s1);
+           // m = new Integer(s2);
 
             //creaMap(n, m, x, y);
 
@@ -193,35 +289,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
 
 
-        //mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-        mOpenCvCameraView.setMaxFrameSize(640, 480);
-        mOpenCvCameraView.setCvCameraViewListener(new CameraBridgeViewBase.CvCameraViewListener2() {
-            @Override
-            public void onCameraViewStarted(int width, int height) {
 
-            }
-
-            @Override
-            public void onCameraViewStopped() {
-
-            }
-
-            @Override
-            public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-                Mat frame = inputFrame.rgba();
-                LineFinder lineFinder = new LineFinder(frame, true);
-                lineFinder.setThreshold(300, 20);;
-                lineFinder.setOrientation("landscape");
-                double inclination = lineFinder.findLine();
-
-                if (!Double.isNaN(inclination)) {
-                    Log.e("Line inclination", String.valueOf(inclination));
-                }
-                return frame;
-            }
-        });
-
-        mOpenCvCameraView.enableView();
     }
 
 
@@ -279,10 +347,10 @@ public class FirstTryActivity extends AppCompatActivity {
 
     public void startDiscovery() {
         Log.e(TAG,"discovery");
+        tv1.setText("discovery...");
         DiscoveryOptions discoveryOptions = new DiscoveryOptions.Builder().setStrategy(STRATEGY).build();
         connectionsClient.startDiscovery(SERVICE_ID, endpointDiscoveryCallback, discoveryOptions); //per comunicare con GroundStaion
-
-       // connectionsClient.startDiscovery(packageName, endpointDiscoveryCallback, discoveryOptions); //per comunicare con altri
+        // connectionsClient.startDiscovery(packageName, endpointDiscoveryCallback, discoveryOptions); //per comunicare con altri
     }
 
     /** Step 2: Manage Connection ***********************************************************************************************************/
@@ -293,11 +361,8 @@ public class FirstTryActivity extends AppCompatActivity {
 
                 @Override
                 public void onEndpointFound(@NonNull String endpointId, @NonNull DiscoveredEndpointInfo info){
-                    Log.e(TAG, "onEndpointFound: endpoint found");
-                    Log.e(TAG, "endpointID: "+endpointId);
-
-                    //inserire controllo per membri della squadre
-
+                    Log.e(TAG, "onEndpointFound: endpoint found: "+endpointId);
+                    tv1.setText("endpoint found: "+endpointId);
                     connectionsClient.requestConnection(deviceA, endpointId, connectionLifecycleCallback);
                 }
 
@@ -323,8 +388,9 @@ public class FirstTryActivity extends AppCompatActivity {
                 @Override
                 public void onConnectionResult(@NonNull String endpointId,@NonNull ConnectionResolution result) {
                     if (result.getStatus().isSuccess()) {
-                        //Toast.makeText(MainActivity.this,"CONNESSO",Toast.LENGTH_SHORT).show();
                         Log.e(TAG,"onConnectionResult: connection succesful");
+                        tv1.setText("connesso a "+ endpointId);
+                        tv1.setTextColor(Color.GREEN);
                         connectionsClient.stopDiscovery();
                         connectionsClient.stopAdvertising();
                         deviceBEndpointId = endpointId;
@@ -351,9 +417,23 @@ public class FirstTryActivity extends AppCompatActivity {
     /** COMUNICAZIONE PASSIVA */
 
     public void sendMyPayLoad(@NonNull String x) {
+        MyMex.add(x) ;
         byte[] coordBytes = x.getBytes(UTF_8);
         Payload coordPayload = Payload.fromBytes(coordBytes);
         connectionsClient.sendPayload(deviceBEndpointId,coordPayload);
+    }
+
+    public String MyStop = id+"STOP";
+    public String AllStop = "0STOP";
+    public String MyResume = id+"START";
+    public String AllResume = "0START";
+    public String coordinata = "Coordinate obiettivo";
+
+    public String dec = null;
+
+    public void updateVal(String id){
+        MyStop = id+"STOP";
+        MyResume = id+"START";
     }
 
     public final PayloadCallback payloadCallback =
@@ -361,53 +441,126 @@ public class FirstTryActivity extends AppCompatActivity {
 
                 @Override
                 public void onPayloadReceived(@NonNull String endpointId, @NonNull Payload payload) {
-                    Log.e(TAG1, "inizio trasferimento da "+endpointId);
+                    Log.e(TAG1, "inizio trasferimento da "+endpointId + "a robot "+id);
+
+                    String s = convert2(payload);
+                    updateVal(id);
+                    if (!MyMex.contains(s)) {
+
+                        if (s.equals(MyStop)) {
+                            Log.e(TAG1,s);
+                            MyMotionStop.add(s);
+                        }
+                        else {
+                            if (s.equals(AllStop)){
+                                Log.e(TAG1,s);
+                                MyMotionStop.add(s);
+                            }
+                            else {
+                                if (s.equals(MyResume)) {
+                                    Log.e(TAG1, s);
+                                    MyMotionStop.add(s);
+                                }
+                                else {
+                                    if (s.equals(AllResume)){
+                                        Log.e(TAG1, s);
+                                        MyMotionStop.add(s);
+                                    }
+                                    else {
+                                        String ss[] = s.split(":");
+                                        if (ss[0].equals(coordinata)) {
+                                            convert(payload);
+                                        }
+                                        else{
+                                            Log.e(TAG1, "testo cifrato: " + s);
+
+                                            try {
+                                                dec = decrypt(payload, chiave);
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                            Log.e(TAG, "testo decifrato: " + dec);
+
+                                            String[] s2 = dec.split(":");
+                                            String[] s3 = s2[1].split(";");
+                                            String x = s3[0];
+                                            String y = s3[1];
+
+                                            listCoordMines2.add(x);
+                                            listCoordMines2.add(y);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        Log.e(TAG1,"MyMex ritornato");
+                    }
 
                     /** caso base */
-                    convert(payload);
-                    Log.e("====>",listCoordMines2.toString());
+                    //convert(payload);
+                    //Log.e("====>",listCoordMines.toString());
 
                     /** test */
 
-                    /*String s = convert2(payload);
 
-                    if (s.equals("Benvenuto sono Pippo")){
-                        Log.e(TAG,"a");
-                        listCoordMines2.add(s);
-                    }
-                    else {
-                        if (s.equals("0STOP")){
-                            Log.e(TAG,"b");
-                            listCoordMines2.add(s);
+                    /*if (!MyMex.contains(s)) {
+
+                        if (s.equals("Benvenuto sono Pippo")) {
+                            Log.e(TAG, "a");
+                            listCoordMines.add(s);
                         }
                         else {
-                            if (s.equals("1STOP")){
-                                Log.e(TAG,"c");
-                                listCoordMines2.add(s);
-                            }
-                            if (s.equals("Coordinate recupero:3;6;")){
-                                Log.e(TAG,"d");
-                                convert(payload);
+                            if (s.equals("0STOP")) {
+                                Log.e(TAG, "b");
+                                listCoordMines.add(s);
                             }
                             else {
-                                Log.e(TAG,"testo cifrato: "+s);
-
-                                String dec = null;
-                                try {
-                                    dec = decrypt(s,"abcdefgh");
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                                if (s.equals("1STOP")) {
+                                    Log.e(TAG, "c");
+                                    listCoordMines.add(s);
                                 }
-                                Log.e(TAG,"testo decifrato: "+dec);
+                                else {
+                                    if (s.equals("2STOP")) {
+                                        Log.e(TAG, "qua");
+                                        listCoordMines.add(s);
+                                    }
+                                    else {
+                                        if (s.equals("Coordinate recupero:3;6;")) {
+                                            Log.e(TAG, "d");
+                                            convert(payload);
+                                        }
+                                        else {
+                                            Log.e(TAG, "testo cifrato: " + s);
 
-                                String[] s2 = dec.split(";");
-                                String x = s2[0];
-                                String y = s2[1];
-                                listCoordMines2.add(x);
-                                listCoordMines2.add(y);
+                                            dec = null;
+                                            try {
+                                                dec = decrypt(payload, "abcdefgh");
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                            Log.e(TAG, "testo decifrato: " + dec);
+
+                                            String[] s2 = dec.split(":");
+                                            String[] s3 = s2[1].split(";");
+                                            String x = s3[0];
+                                            String y = s3[1];
+
+                                            listCoordMines.add(x);
+                                            listCoordMines.add(y);
+                                        }
+                                    }
+                                }
                             }
                         }
+                    }
+                    else {
+                        Log.e(TAG1,"MyMex ritornato");
                     }*/
+
+                    Log.e("MotionStop ====>",MyMotionStop.toString());
+                    Log.e("Mine ====>",listCoordMines2.toString());
 
                 }
 
@@ -442,16 +595,16 @@ public class FirstTryActivity extends AppCompatActivity {
     /** COMUNICAZIONE ATTIVA */
 
     public void sendMyCryptoPayLoad(String x, String psw) throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        Long t = calendar.getTimeInMillis();
+        //x += t;
+        MyMex.add(x);
         String enc = encrypt(x,psw);
         //String enc = encrypt(x,"aaaaaaaa");
         //Toast.makeText(MainActivity.this, enc, Toast.LENGTH_SHORT).show();
         byte[] coordBytes = enc.getBytes(UTF_8);
         Payload coordPayload = Payload.fromBytes(coordBytes);
         connectionsClient.sendPayload(deviceBEndpointId,coordPayload);
-
-        //timestamp
-        //Calendar calendar = Calendar.getInstance();
-        //Long time_long = calendar.getTimeInMillis();
     }
 
     public final PayloadCallback CryptoPayloadCallback =
@@ -464,7 +617,7 @@ public class FirstTryActivity extends AppCompatActivity {
                     Log.e(TAG,"testo cifrato = "+PayloadSent);
                     String dec = null;
                     try {
-                        dec = decrypt(PayloadSent,"aaaaaaaa");
+                        dec = decrypt(payload,"aaaaaaaa");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -490,37 +643,24 @@ public class FirstTryActivity extends AppCompatActivity {
                 }
             };
 
-    public String decrypt(String outputString, String psw) throws Exception{
-
-        /*DESKeySpec keySpec = new DESKeySpec(psw.getBytes());
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-        SecretKey key = keyFactory.generateSecret(keySpec);
-        Cipher c = Cipher.getInstance("DES/ECB/ISO10126Padding");
-        c.init(c.DECRYPT_MODE, key);*/
-
-        SecretKeySpec key = new SecretKeySpec("abcdefgh".getBytes(), "DES");
+    public String decrypt(Payload payload, String psw) throws Exception{
+        byte[] bytes = payload.asBytes();
+        SecretKeySpec key = new SecretKeySpec(KEY.getBytes(), "DES");
         Cipher c = Cipher.getInstance("DES/ECB/ISO10126Padding");
         c.init(c.DECRYPT_MODE, key);
-        byte[] decodedValue = Base64.decode(outputString, Base64.DEFAULT);
-        byte[] decValue = c.doFinal(decodedValue);
-        String decryptValue = new String(decValue);
-        return decryptValue;
+        byte[] plaintext = c.doFinal(bytes);
+        String s = new String(plaintext);
+        return s;
     }
 
     public String encrypt(String data, String psw) throws Exception{
-        //DESKeySpec keySpec = new DESKeySpec("aaaaaaaa".getBytes());
-        DESKeySpec keySpec = new DESKeySpec(psw.getBytes());
-        SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("DES");
-        SecretKey key = keyFactory.generateSecret(keySpec);
-
+        SecretKeySpec key = new SecretKeySpec(KEY.getBytes(), "DES");
         Cipher c = Cipher.getInstance("DES/ECB/ISO10126Padding");
         c.init(c.ENCRYPT_MODE, key);
-        byte[] encVal = c.doFinal(data.getBytes());
-        String encryptedValue = Base64.encodeToString(encVal, Base64.DEFAULT);
+        byte[] encVal = c.doFinal(data.getBytes(UTF_8));
+        String encryptedValue = new String(encVal, UTF_8);
         return encryptedValue;
     }
-
-
 
 
     public List<String> getMines(){
@@ -646,7 +786,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
         List<Floor.OnFloorPosition> minePosition = new ArrayList<>(); //TODO /*da mettere globale??*/
 
-        PrimaProva test = new PrimaProva(getApplicationContext(), tachoMaster , floorMaster  , sensorMaster , this);
+        PrimaProva test = new PrimaProva(getApplicationContext(), tachoMaster , floorMaster  , sensorMaster ,  cameraListener);
         int mine = 3 ;
         try {
             while (!ev3.isCancelled() && mine>0 ) {
@@ -656,11 +796,11 @@ public class FirstTryActivity extends AppCompatActivity {
                 x = pos.getRow();
                 y = pos.getCol();
 
-                runOnUiThread(() -> {
+                /*runOnUiThread(() -> {
                     Log.e("====>", "aggiormo mappa");
                     ll.removeAllViews();
                     creaMap(floor.getWidth(),floor.getHeight(),x,y);
-                });
+                });*/
 
                 test.goToStartPosition();
                 test.releaseMine();
@@ -668,7 +808,11 @@ public class FirstTryActivity extends AppCompatActivity {
 
             }
         }
-        catch (InterruptedException e) {
+        catch(Exception e ) {
+            Log.e("BOH:","errore");
+            e.printStackTrace();
+        }
+       /* catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -677,9 +821,44 @@ public class FirstTryActivity extends AppCompatActivity {
         } catch (FloorMaster.AllPositionVisited allPositionVisited) {
             allPositionVisited.printStackTrace();
             Log.d("PRIMA PROVA : " , "Tutto il campo è stato visitato");
-        } finally {
+        } */finally {
             Prelude.trap(()->tachoMaster.stopMotors());
         }
 
+    }
+
+
+    public static class MyCameraListener implements CameraBridgeViewBase.CvCameraViewListener2{
+        double inclination = Double.NaN;
+        double prev_inclination=Double.NaN;
+        public double getInclination(){return inclination;}
+        @Override
+        public void onCameraViewStarted(int width, int height) {
+
+        }
+
+        @Override
+        public void onCameraViewStopped() {
+
+        }
+
+        @Override
+        public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+            Mat frame = inputFrame.rgba();
+            LineFinder lineFinder = new LineFinder(frame, true);
+            lineFinder.setThreshold(120, 240);
+            lineFinder.setOrientation("landscape");
+            if(Double.isNaN(inclination) && !Double.isNaN(prev_inclination))
+                inclination = prev_inclination;
+            else {
+                inclination = lineFinder.findLine();
+                prev_inclination = inclination;
+            }
+
+            if (!Double.isNaN(inclination)) {
+               // Log.e("Line inclination", String.valueOf(inclination));
+            }
+            return frame;
+        }
     }
 }

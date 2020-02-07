@@ -138,6 +138,7 @@ public class Floor {
     }
 
     public boolean getMine(OnFloorPosition pos){return field[pos.getRow()][pos.getCol()].getMine();}
+    public boolean getChecked(OnFloorPosition pos){return field[pos.getRow()][pos.getCol()].getChecked();}
 
     public Direction getBotDirection(){return botDirection.getDirection();}
 
