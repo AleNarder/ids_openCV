@@ -117,7 +117,6 @@ public class FirstTryActivity extends AppCompatActivity {
     UltrasonicSensor ultra;
     GyroSensor gyro;
     SensorMaster sensorMaster;
-
     LinearLayout ll;
 
     int cnt = 0, x = -1, y = -1;
@@ -212,7 +211,7 @@ public class FirstTryActivity extends AppCompatActivity {
             Button stopButton2 = findViewById(R.id.stopButton2);
             stopButton2.setOnClickListener(v2 -> ev3.cancel());
             ll = findViewById(R.id.linearlayout0);*/
-
+            floor = new Floor(n,m, 29.5f ,29.5f);
             mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
             mOpenCvCameraView.setMaxFrameSize(320, 240);
             cameraListener = new MyCameraListener();
@@ -654,7 +653,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
         sensorMaster = new SensorMaster(ultra, gyro);
         tachoMaster = new TachoMaster(motorA, motorD, motorC);
-        floor = new Floor(n,m, 29.5f ,29.5f); //TODO: variabile globale??? utile se devo salvare lo stato del robot sul campo
+        //floor = new Floor(n,m, 29.5f ,29.5f); //TODO: variabile globale??? utile se devo salvare lo stato del robot sul campo
 
         floorMaster = new FloorMaster(floor);
 

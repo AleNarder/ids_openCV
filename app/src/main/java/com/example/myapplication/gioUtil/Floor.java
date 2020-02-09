@@ -113,6 +113,18 @@ public class Floor {
 
     }
 
+    public Direction safeDirection(OnFloorPosition pos){
+        Direction[] allDirections = Direction.class.getEnumConstants();
+        BotDirection tempDirection = new BotDirection(Direction.VERTICAL_UP);
+        for(int i=0;i<allDirections.length;i++){
+            tempDirection.setDirection(allDirections[i]);
+            if((pos.getRow()+tempDirection.getY())<0 || (pos.getRow()+tempDirection.getY())>=width)
+                return allDirections[i];
+            if((pos.getCol()+tempDirection.getX())<0 || (pos.getCol()+tempDirection.getX())>=height)
+                return allDirections[i];
+        }
+        return null;
+    }
     public BotDirection getBot(){return botDirection;}
     public OnFloorPosition getActualPosition() {
         return actualPosition;

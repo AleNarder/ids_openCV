@@ -240,10 +240,20 @@ public class PrimaProva {
     }
 
     public void releaseMine() throws InterruptedException, ExecutionException, IOException {
+
+        Floor.Direction prevD = floorMaster.getFloor().getBotDirection();
+        Floor.Direction d = floorMaster.getFloor().safeDirection(floorMaster.floor.getStartPosition());
+        Floor.TurnDirection turn = floorMaster.turnDirection(d);
+        tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
+
         tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
         tachoMaster.releaseMine(30,4000);
         tachoMaster.resetMovementMotorsPosition();
         tachoMaster.countAdjustment(-20,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
+
+        turn = floorMaster.turnDirection(prevD);
+        tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
+
     }
 
 
