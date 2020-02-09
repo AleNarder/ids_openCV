@@ -162,7 +162,8 @@ public class PrimaProva {
        // tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
         //tachoMaster.releaseMine(20,3000);
         tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
-        tachoMaster.takeMine(-20,2000);tachoMaster.releaseMine(20,3000);
+        tachoMaster.takeMine(30,2000);
+        tachoMaster.releaseMine(-30,3000);
 
         //tachoMaster.takeMine(-20,3000);
       //  tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
@@ -240,7 +241,7 @@ public class PrimaProva {
 
     public void releaseMine() throws InterruptedException, ExecutionException, IOException {
         tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
-        tachoMaster.releaseMine(-20,4000);
+        tachoMaster.releaseMine(30,4000);
         tachoMaster.resetMovementMotorsPosition();
         tachoMaster.countAdjustment(-20,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
     }
