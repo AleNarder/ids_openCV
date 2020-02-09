@@ -69,7 +69,7 @@ public class Nearby {
     private String KEY = "abcdefgh";
 
 
-    public String packageName = FirstTryActivity.PACKAGE_NAME;
+    //public String packageName = FirstTryActivity.PACKAGE_NAME;
 
 
 
@@ -81,7 +81,7 @@ public class Nearby {
     public void startAdvertising() {
         Log.e(TAG,"advertising");
         AdvertisingOptions advertisingOptions = new AdvertisingOptions.Builder().setStrategy(STRATEGY).build();
-        connectionsClient.startAdvertising(deviceA, packageName, connectionLifecycleCallback, advertisingOptions);
+        //connectionsClient.startAdvertising(deviceA, packageName, connectionLifecycleCallback, advertisingOptions);
     }
 
     public void startDiscovery() {
@@ -180,17 +180,17 @@ public class Nearby {
 
                     if (s.equals("Benvenuto sono Pippo")){
                         Log.e(TAG,"a");
-                        listCoordMines2.add(s);
+                        listCoordMines.add(s);
                     }
                     else {
                         if (s.equals("0STOP")){
                             Log.e(TAG,"b");
-                            listCoordMines2.add(s);
+                            listCoordMines.add(s);
                         }
                         else {
                             if (s.equals("1STOP")){
                                 Log.e(TAG,"c");
-                                listCoordMines2.add(s);
+                                listCoordMines.add(s);
                             }
                             if (s.equals("Coordinate recupero:3;6;")){
                                 Log.e(TAG,"d");
@@ -210,8 +210,8 @@ public class Nearby {
                                 String[] s2 = dec.split(";");
                                 String x = s2[0];
                                 String y = s2[1];
-                                listCoordMines2.add(x);
-                                listCoordMines2.add(y);
+                                listCoordMines.add(x);
+                                listCoordMines.add(y);
                             }
                         }
                     }*/

@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">My Application</string>
-    <string name="title_activity_nearby">NearbyActivity</string>
+
+    <string-array name="position">
+
+        <item>R+</item>
+        <item>R-</item>
+        <item>C+</item>
+        <item>C-</item>
+
+    </string-array>
+
 </resources>

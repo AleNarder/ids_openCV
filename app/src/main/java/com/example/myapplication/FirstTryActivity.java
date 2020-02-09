@@ -65,7 +65,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class FirstTryActivity extends AppCompatActivity {
 
-    /**** CIAO FISTA**/
     /*** NEARBY VAR**************************************************************************************************************/
 
     /*private static final String TAG  = "ProvaCryptoNearby";
@@ -120,7 +119,6 @@ public class FirstTryActivity extends AppCompatActivity {
 
     public static List<String> listCoordMines2 = new ArrayList<>();
     public static List<String> MyMex = new ArrayList<>();
-    //public static List<String> MotionStop = new ArrayList<>();
     public static Queue<String> MyMotionStop = new ConcurrentLinkedQueue<>();
 
     private static final String SERVICE_ID = "it.unive.dais.nearby.apps.SERVICE_ID";
