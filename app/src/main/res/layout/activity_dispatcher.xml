@@ -10,33 +10,33 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:id="@+id/openCV"
+            android:id="@+id/prova1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="OpenCV" />
+            android:text="Prima Prova" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
         <Button
-            android:id="@+id/test"
+            android:id="@+id/prova2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="test" />
+            android:text="Seconda Prova" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
         <Button
-            android:id="@+id/nearby"
+            android:id="@+id/prova3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="nearby" />
+            android:text="Terza Prova" />
 
     </LinearLayout>
 

@@ -73,7 +73,7 @@ public class FirstTryActivity extends AppCompatActivity {
     private String deviceA = "EV3MCLOVIN";
     private String deviceB = "GroundStation";
     private String deviceBEndpointId;
-    private EditText et1, et2, et3, et4, et5, et6;
+    private EditText et1, et2, et3, et4, et5, et6 , et7;
     private TextView tv1, tv2, tv3;
     private String chiave, id;
     private Button startButtonFirst, stopButtonFirst, discButton, disconnectButton, showMex, sendButton;
@@ -118,7 +118,7 @@ public class FirstTryActivity extends AppCompatActivity {
     SensorMaster sensorMaster;
     LinearLayout ll;
     Floor.Direction startDirection;
-    int cnt = 0, x = -1, y = -1;
+    int cnt = 0, x = -1, y = -1 , nMine;
 
     /** dimensione campo */
     Integer n=3, m=3;
@@ -147,6 +147,7 @@ public class FirstTryActivity extends AppCompatActivity {
         et4 = findViewById(R.id.idRobot);
         et5 = findViewById(R.id.editText5);
         et6 = findViewById(R.id.editText6);
+        et7 = findViewById(R.id.editText7);
 
         tv1 = findViewById(R.id.statoConnesione);
         //tv2 = findViewById(R.id.messages);
@@ -215,7 +216,7 @@ public class FirstTryActivity extends AppCompatActivity {
             stopButton2.setOnClickListener(v2 -> ev3.cancel());
             ll = findViewById(R.id.linearlayout0);*/
             //floor = new Floor(n,m, 29.5f ,29.5f);
-
+            nMine = new Integer(String.valueOf(et7.getText()));
             String s1 = et1.getText().toString();
             String s2 = et2.getText().toString();
             posX = new Integer(String.valueOf(et5.getText()));
@@ -711,7 +712,7 @@ public class FirstTryActivity extends AppCompatActivity {
         List<Floor.OnFloorPosition> minePosition = new ArrayList<>(); //TODO /*da mettere globale??*/
 
         PrimaProva test = new PrimaProva(getApplicationContext(), tachoMaster , floorMaster  , sensorMaster ,  cameraListener);
-        int mine = 3 ;
+        int mine = nMine ;
         try {
             while (!ev3.isCancelled() && mine>0 ) {
 

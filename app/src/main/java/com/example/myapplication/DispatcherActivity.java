@@ -16,9 +16,7 @@ public class DispatcherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dispatcher);
 
-        Button testButton = findViewById(R.id.test);
-        Button openCVButton = findViewById(R.id.openCV);
-        Button nearbyButton = findViewById(R.id.nearby);
+        Button prova1Button = findViewById(R.id.prova1);
 
         if (!OpenCVLoader.initDebug()) {
             Log.e("AndroidIngSwOpenCV", "Unable to load OpenCV");
@@ -26,13 +24,9 @@ public class DispatcherActivity extends AppCompatActivity {
             Log.d("AndroidIngSwOpenCV", "OpenCV loaded");
         }
 
-        Intent testIntent   = new Intent(getBaseContext(), FirstTryActivity.class);
-        Intent openCVIntent = new Intent(getBaseContext(), MainActivity.class);
-        //Intent nearbyIntent = new Intent(getBaseContext(), Nearby.class);
+        Intent prova1Intent   = new Intent(getBaseContext(), FirstTryActivity.class);
 
-        testButton.setOnClickListener(v->startActivity(testIntent));
-        openCVButton.setOnClickListener(v->startActivity(openCVIntent));
-        //nearbyButton.setOnClickListener(v->startActivity(nearbyIntent));
+        prova1Button.setOnClickListener(v->startActivity(prova1Intent));
 
     }
 }
