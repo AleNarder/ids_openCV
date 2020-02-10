@@ -17,8 +17,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.myapplication.gioUtil.Mina;
 import com.google.android.gms.nearby.Nearby;
-import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
 import com.google.android.gms.nearby.connection.ConnectionLifecycleCallback;
 import com.google.android.gms.nearby.connection.ConnectionResolution;
@@ -60,8 +60,6 @@ import it.unive.dais.legodroid.lib.plugs.TachoMotor;
 import it.unive.dais.legodroid.lib.plugs.UltrasonicSensor;
 import it.unive.dais.legodroid.lib.util.Prelude;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 public class FirstTryActivity extends AppCompatActivity {
 
     /*** NEARBY VAR **************************************************************************************************************/
@@ -75,10 +73,11 @@ public class FirstTryActivity extends AppCompatActivity {
     private String deviceA = "EV3MCLOVIN";
     private String deviceB = "GroundStation";
     private String deviceBEndpointId;
-    private EditText et1, et2, et3, et4;
+    private EditText et1, et2, et3, et4, et5, et6;
     private TextView tv1, tv2, tv3;
     private String chiave, id;
     private Button startButtonFirst, stopButtonFirst, discButton, disconnectButton, showMex, sendButton;
+    public Integer posX, posY;
 
     public static List<String> listCoordMines = new ArrayList<>();
     public static List<String> MyMex = new ArrayList<>();
@@ -118,13 +117,15 @@ public class FirstTryActivity extends AppCompatActivity {
     GyroSensor gyro;
     SensorMaster sensorMaster;
     LinearLayout ll;
-
+    Floor.Direction startDirection;
     int cnt = 0, x = -1, y = -1;
 
     /** dimensione campo */
     Integer n=3, m=3;
 
     private CameraBridgeViewBase mOpenCvCameraView;
+
+    ArrayList<Mina> mineList = new ArrayList<>();
 
     /*******************************************************************************************************************************/
 
@@ -137,16 +138,18 @@ public class FirstTryActivity extends AppCompatActivity {
         stopButtonFirst = findViewById(R.id.stopButtonFirst);
         discButton = findViewById(R.id.discoveryButton);
         disconnectButton = findViewById(R.id.disconnectButton);
-        showMex = findViewById(R.id.button5);
+        //showMex = findViewById(R.id.button5);
         sendButton = findViewById(R.id.sendButton);
 
         et1 = findViewById(R.id.editText1);
         et2 = findViewById(R.id.editText2);
         et3 = findViewById(R.id.key);
         et4 = findViewById(R.id.idRobot);
+        et5 = findViewById(R.id.editText5);
+        et6 = findViewById(R.id.editText6);
 
         tv1 = findViewById(R.id.statoConnesione);
-        tv2 = findViewById(R.id.messages);
+        //tv2 = findViewById(R.id.messages);
         tv3 = findViewById(R.id.statoRobot);
 
         connectionsClient = Nearby.getConnectionsClient(this);
@@ -160,9 +163,9 @@ public class FirstTryActivity extends AppCompatActivity {
             startDiscovery();
         });
 
-        showMex.setOnClickListener(v -> {
+        /*showMex.setOnClickListener(v -> {
             tv2.setText(listCoordMines.toString());
-        });
+        });*/
 
         disconnectButton.setOnClickListener(v -> {
             connectionsClient.stopDiscovery();
@@ -211,7 +214,19 @@ public class FirstTryActivity extends AppCompatActivity {
             Button stopButton2 = findViewById(R.id.stopButton2);
             stopButton2.setOnClickListener(v2 -> ev3.cancel());
             ll = findViewById(R.id.linearlayout0);*/
-            floor = new Floor(n,m, 29.5f ,29.5f);
+            //floor = new Floor(n,m, 29.5f ,29.5f);
+
+            String s1 = et1.getText().toString();
+            String s2 = et2.getText().toString();
+            posX = new Integer(String.valueOf(et5.getText()));
+            posY = new Integer(String.valueOf(et6.getText()));
+
+            n = new Integer(s1);
+            m = new Integer(s2);
+
+            Log.e("=============>", posX.toString()+" "+posY.toString()+" "+startDirection);
+
+            floor = new Floor(n,m , 29.7f, 29.7f, posX,posY,startDirection);
             mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
             mOpenCvCameraView.setMaxFrameSize(320, 240);
             cameraListener = new MyCameraListener();
@@ -220,10 +235,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
             Log.e("FIRST :","Camera active");
 
-            String s1 = et1.getText().toString();
-            String s2 = et2.getText().toString();
-            //n = new Integer(s1);
-            //m = new Integer(s2);
+
             //creaMap(n, m, x, y);
 
             Prelude.trap(() -> ev3.run(this::ev3Task3));
@@ -238,6 +250,21 @@ public class FirstTryActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 //Toast.makeText(FirstTryActivity.this,parent.getSelectedItem().toString(),Toast.LENGTH_SHORT).show();
+                String s = parent.getSelectedItem().toString();
+                switch(s){
+                    case "R+":
+                        startDirection= Floor.Direction.VERTICAL_UP;
+                        break;
+                    case "R-":
+                        startDirection= Floor.Direction.VERTICAL_DOWN;
+                        break;
+                    case "C+":
+                        startDirection= Floor.Direction.HORIZONTAL_UP;
+                        break;
+                    case "C-":
+                        startDirection= Floor.Direction.HORIZONTAL_DOWN;
+                        break;
+                }
             }
 
             @Override
@@ -251,12 +278,21 @@ public class FirstTryActivity extends AppCompatActivity {
 
     /**************************************************************************************************************************/
 
-    public void creaMap(int n, int m, int x, int y) {
+    /*public void creaMap(int n, int m, int x, int y) {
         for (int i = 0; i < n; i++)
             addButton(i, m, x, y);
+    }*/
+
+    public void creaMap(ArrayList<Mina> list, int n, int m){
+        for(int i=0; i<list.size();i++){
+            int x = list.get(i).getPosition().getRow();
+            int y = list.get(i).getPosition().getCol();
+            String color = list.get(i).getColor();
+            addButton(i,m,x,y,color);
+        }
     }
 
-    public void addButton(int n, int m, int x, int y) {
+    public void addButton(int n, int m, int x, int y, String col) {
         LinearLayout ll2 = new LinearLayout(this);
         ll2.setOrientation(LinearLayout.HORIZONTAL);
         LinearLayout.LayoutParams ll_params =
@@ -273,8 +309,21 @@ public class FirstTryActivity extends AppCompatActivity {
             btn.setId(cnt);
             cnt++;
 
-            if (n == x && i == y)
-                btn.setBackgroundColor(Color.RED);
+            if (n == x && i == y){
+                switch (col){
+                    case "red":
+                        btn.setBackgroundColor(Color.RED);
+                        break;
+                    case "yellow":
+                        btn.setBackgroundColor(Color.YELLOW);
+                        break;
+                    case "blue":
+                        btn.setBackgroundColor(Color.BLUE);
+                        break;
+                }
+
+            }
+
 
             final int x2 = i;
             btn.setOnClickListener(v -> {
@@ -368,7 +417,7 @@ public class FirstTryActivity extends AppCompatActivity {
     /** Step 3: Exchange Data */
 
     public void convert(@NonNull Payload payload){
-        String s = new String(payload.asBytes(),UTF_8);
+        String s = new String(payload.asBytes());
         String[] s2 = s.split(":");
         String[] s3 = s2[1].split(";");
         String x = s3[0];
@@ -378,7 +427,7 @@ public class FirstTryActivity extends AppCompatActivity {
     }
 
     public String convert2(@NonNull Payload payload){
-        String x = new String(payload.asBytes(),UTF_8);
+        String x = new String(payload.asBytes());
         return x;
     }
 
@@ -452,6 +501,7 @@ public class FirstTryActivity extends AppCompatActivity {
                         }
                         else {
                             if (s.equals(AllStop)){
+                                ev3.cancel();
                                 Log.e(TAG1,s);
                                 MyMotionStop.add(s);
                             }
@@ -462,11 +512,12 @@ public class FirstTryActivity extends AppCompatActivity {
                                 }
                                 else {
                                     if (s.equals(AllResume)){
+                                        Prelude.trap(() -> ev3.run(FirstTryActivity.this::ev3Task3));
                                         Log.e(TAG1, s);
                                         MyMotionStop.add(s);
                                     }
                                     else {
-                                        String z[] = s.split("S");
+                                        String[] z = s.split("S");
                                         if ((s.contains("STOP") || s.contains("START")) && z[0] != id) {
                                             Log.e(TAG1, "MotionStop per altri robot");
                                         }
@@ -665,10 +716,9 @@ public class FirstTryActivity extends AppCompatActivity {
             while (!ev3.isCancelled() && mine>0 ) {
 
                 test.findMine();
-                Floor.OnFloorPosition pos = test.takeMine() ;
+                Mina minn = test.takeMine() ;
 
-                x = pos.getRow();
-                y = pos.getCol();
+                mineList.add(minn);
 
                 /*runOnUiThread(() -> {
                     Log.e("====>", "aggiormo mappa");
@@ -682,11 +732,8 @@ public class FirstTryActivity extends AppCompatActivity {
 
             }
         }
-        catch(Exception e ) {
-            Log.e("BOH:","errore");
-            e.printStackTrace();
-        }
-       /* catch (InterruptedException e) {
+
+        catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
@@ -695,8 +742,18 @@ public class FirstTryActivity extends AppCompatActivity {
         } catch (FloorMaster.AllPositionVisited allPositionVisited) {
             allPositionVisited.printStackTrace();
             Log.d("PRIMA PROVA : " , "Tutto il campo è stato visitato");
-        } */finally {
+        } finally {
             Prelude.trap(()->tachoMaster.stopMotors());
+
+
+            /*runOnUiThread(() -> {
+                mOpenCvCameraView.disableView();
+                mOpenCvCameraView.setVisibility(SurfaceView.GONE);
+                ll = findViewById(R.id.linearlayout0);
+                ll.removeAllViews();
+                setContentView(R.layout.activity_map);
+                creaMap(mineList,n,m);
+            });*/
         }
 
     }
@@ -705,7 +762,9 @@ public class FirstTryActivity extends AppCompatActivity {
     public static class MyCameraListener implements CameraBridgeViewBase.CvCameraViewListener2{
         double inclination = Double.NaN;
         double prev_inclination=Double.NaN;
+        String color;
         public double getInclination(){return inclination;}
+        public String getColor(){return color;}
         @Override
         public void onCameraViewStarted(int width, int height) {
 
@@ -731,6 +790,19 @@ public class FirstTryActivity extends AppCompatActivity {
 
             if (!Double.isNaN(inclination)) {
                 // Log.e("Line inclination", String.valueOf(inclination));
+            }
+
+            BallFinder ballFinder = new BallFinder(frame, true);
+            ballFinder.setViewRatio(0.2f);
+            ballFinder.setOrientation("landscape");
+            ArrayList<Ball> f = ballFinder.findBalls();
+
+            for (Ball b : f) {
+                Log.e("ball", String.valueOf(b.center.x));
+                Log.e("ball", String.valueOf(b.center.y));
+                Log.e("ball", String.valueOf(b.radius));
+                Log.e("ball", b.color);
+                color = b.color;
             }
             return frame;
         }

@@ -76,14 +76,14 @@ public class BallFinder {
 
     public void setYellowThreshold(int lower, int upper) {
         this.yellow_lower = lower;
-        this.yellow_upper = upper;
+        this.yellow_upper= upper;
     }
 
     public ArrayList<Ball> findBalls() {
         ArrayList<Ball> balls = new ArrayList<>();
 
         Mat hsv = new Mat();
-        List<Mat> split_hsv = new ArrayList<>();
+        List <Mat> split_hsv = new ArrayList<>();
 
         Imgproc.cvtColor(frame, hsv, Imgproc.COLOR_RGB2HSV);
         Core.split(hsv, split_hsv);
@@ -154,8 +154,8 @@ public class BallFinder {
                     color = "yellow";
                 else
                     color = "unknown";
-
-                balls.add(new Ball(center, radius[0], color));
+                if(radius[0]>50)
+                    balls.add(new Ball(center, radius[0], color));
 
                 if (debug) {
                     Scalar color_rgb;
@@ -169,7 +169,8 @@ public class BallFinder {
                     else
                         color_rgb = new Scalar(0, 0, 0);
 
-                    Imgproc.circle(frame, center, (int) radius[0], color_rgb, 2);
+                    if(radius[0]>50)
+                        Imgproc.circle(frame, center, (int) radius[0], color_rgb, 2);
                 }
             }
         }

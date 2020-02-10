@@ -119,27 +119,43 @@ public class FloorMaster {
     }
 
 
-    public Floor.OnFloorPosition chooseNextPosition() throws AllPositionVisited{
+   public Floor.OnFloorPosition chooseNextPosition() throws AllPositionVisited{
         if(!floor.rawVisited(floor.getActualPosition().getRow())) {
             Log.e("FLOOR : ", "ROW CASE");
-            return new Floor.OnFloorPosition(floor.getActualPosition().getRow(),Math.min(floor.getHeight()-1-floor.getActualPosition().getCol(),floor.getHeight()-1));
-
+            int col;
+            if(floor.getActualPosition().getCol()==0)
+                col=floor.getHeight()-1;
+            else
+                if(floor.getActualPosition().getCol()==floor.getHeight()-1)
+                    col=0;
+                else
+                    col=0;
+            return new Floor.OnFloorPosition(floor.getActualPosition().getRow(),col);
         }
         else {
             if(!floor.colVisited((floor.getActualPosition().getCol()))){
                 Log.e("FLOOR : ", "COL CASE");
-                return new Floor.OnFloorPosition(Math.min(floor.getWidth()-1-floor.getActualPosition().getRow(),floor.getWidth()-1),floor.getActualPosition().getCol());
+                int row;
+                if(floor.getActualPosition().getRow()==0)
+                    row=floor.getWidth()-1;
+                else
+                    if(floor.getActualPosition().getRow()==floor.getWidth()-1)
+                        row=0;
+                    else
+                        row=0;
+                return new Floor.OnFloorPosition(row,floor.getActualPosition().getCol());
             }
-            else{ //TODO
-                int raw=chooseNextRaw();
-                if(raw!=-1) {
+            else{
+                int row=chooseNextRaw();
+                if(row!=-1) {
+                    Log.e("FLOORMASTER:"," riga scelta = "+row);
                     if(floor.getActualPosition().getCol()==0 || floor.getActualPosition().getCol()==floor.getHeight()-1)
-                        return new Floor.OnFloorPosition(raw, floor.getActualPosition().getCol());
+                        return new Floor.OnFloorPosition(row, floor.getActualPosition().getCol());
                     else {
                         if(floor.getHeight()-1-floor.getActualPosition().getCol()>floor.getActualPosition().getCol())
-                            return new Floor.OnFloorPosition(floor.getActualPosition().getRow(), 0);
+                            return new Floor.OnFloorPosition(row, 0);
                         else
-                            return new Floor.OnFloorPosition((floor.getActualPosition()).getRow(),floor.getHeight()-1);
+                            return new Floor.OnFloorPosition(row,floor.getHeight()-1);
 
                     }
                 }
@@ -150,7 +166,8 @@ public class FloorMaster {
 
     public int chooseNextRaw() {
         for(int i=0;i<floor.getWidth();i++)
-            if(!floor.rawVisited(i)) return i;
+            if(!floor.rawVisited(i))
+                return i;
         return -1;
     }
 
@@ -269,7 +286,7 @@ public class FloorMaster {
             actualPosition=new Floor.OnFloorPosition(destination);
             finalPosition=new Floor.OnFloorPosition(source);
         }
-
+        actualPosition.setOnFloorPosition(actualPosition.getRow(),source.getCol());
         while(actualPosition.getRow()<finalPosition.getRow()){
             if(!floor.getChecked(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
                 return false;
@@ -290,6 +307,7 @@ public class FloorMaster {
             actualPosition=new Floor.OnFloorPosition(destination);
             finalPosition=new Floor.OnFloorPosition(source);
         }
+        actualPosition.setOnFloorPosition(source.getRow(),actualPosition.getCol());
         while(actualPosition.getCol()<finalPosition.getCol()){
             if(!floor.getChecked(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
                 return false;

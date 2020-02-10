@@ -156,7 +156,7 @@ public class PrimaProva {
         tachoMaster.stopMotors();
     }
 
-    public Floor.OnFloorPosition takeMine() throws InterruptedException, ExecutionException, IOException {
+    public Mina takeMine() throws InterruptedException, ExecutionException, IOException {
 
        // tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster);
        // tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
@@ -177,7 +177,7 @@ public class PrimaProva {
 
         tachoMaster.resetMovementMotorsPosition();
 
-        return floorMaster.getFloor().getActualPosition();
+        return  new Mina(floorMaster.getFloor().getActualPosition(),cameraListener.getColor());
     }
 
     public void goToStartPosition() throws InterruptedException, ExecutionException, IOException {
@@ -190,10 +190,14 @@ public class PrimaProva {
         while(i>=0 && floorMaster.getFloor().getActualPosition().compareTo(floorMaster.getFloor().getStartPosition())!=0) {
             if (nowhereToGo){
 
-                if((newPosition=floorMaster.chooseNextPositionInv(floorMaster.getFloor().getStartPosition()))!=null)
-                    optimalRoad=true;
-                if(!optimalRoad)
+                if((newPosition=floorMaster.chooseNextPositionInv(floorMaster.getFloor().getStartPosition()))!=null) {
+                    Log.e("PRIMA PROVA","percorso ottimale");
+                    optimalRoad = true;
+                }
+                if(!optimalRoad) {
                     newPosition = botMoves.get(i);
+                    Log.e("PRIMA PROVA","percorso inverso");
+                }
 
                 Floor.Direction d = floorMaster.changeBotDirection(newPosition);
                 Floor.TurnDirection turn = floorMaster.turnDirection(d);
@@ -204,7 +208,7 @@ public class PrimaProva {
 
 
 
-                Log.e("PRIMA PROVA 3 : ", "POSIZIONE SCELTA PERCORSO INVERSO-----> RIGA : "+botMoves.get(i).getRow()+" COLONNA : "+ botMoves.get(i).getCol());
+                Log.e("PRIMA PROVA 3 : ", "POSIZIONE SCELTA PERCORSO INVERSO-----> RIGA : "+newPosition.getRow()+" COLONNA : "+ newPosition.getCol());
 
                 nowhereToGo=false;
             }
@@ -247,7 +251,7 @@ public class PrimaProva {
         tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
 
         tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
-        tachoMaster.releaseMine(30,4000);
+        tachoMaster.releaseMine(30,5000);
         tachoMaster.resetMovementMotorsPosition();
         tachoMaster.countAdjustment(-20,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
 

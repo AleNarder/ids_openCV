@@ -113,6 +113,32 @@ public class Floor {
 
     }
 
+    public Floor(int width , int height , float tileWidth , float tileHeight, int posX , int posY , Direction dir){
+        uncheckedTileList = new ArrayList<>();
+
+        field = new Tile[width][height];
+
+        this.width = width;
+        this.height = height;
+
+        for(int i = 0 ; i<width ; i++)
+            for(int j=0;j<height ; j++) {
+                field[i][j] = new Tile(tileWidth, tileHeight, i, j);
+                uncheckedTileList.add(field[i][j]);
+            }
+
+
+        /**TODO**/
+        startPosition = new OnFloorPosition(posX,posY);
+        field[startPosition.getRow()][startPosition.getCol()].setChecked(true);
+        actualPosition = new OnFloorPosition(startPosition.getRow(),startPosition.getCol());
+        prevPosition=new OnFloorPosition(-1,-1);
+        botDirection = BotDirection.getInstance(dir);
+        nextPosition = new OnFloorPosition(actualPosition.getRow()+botDirection.getY(),actualPosition.getCol()+botDirection.getX());
+
+
+    }
+
     public Direction safeDirection(OnFloorPosition pos){
         Direction[] allDirections = Direction.class.getEnumConstants();
         BotDirection tempDirection = new BotDirection(Direction.VERTICAL_UP);
@@ -207,7 +233,7 @@ public class Floor {
 
     public boolean colVisited(int col){
         if(col<getHeight() && col>=0){
-            for(int i=0;i<getHeight();i++)
+            for(int i=0;i<getWidth();i++)
                 if(!field[i][col].checked)
                     return false;
             return true;

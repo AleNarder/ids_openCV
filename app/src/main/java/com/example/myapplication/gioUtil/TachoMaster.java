@@ -335,7 +335,7 @@ public class TachoMaster {
     }
 
     public void moduleSpeed(int speed, double inclination) throws IOException {
-        Log.e("TACHOMASTER","inclinazione="+inclination);
+       // Log.e("TACHOMASTER","inclinazione="+inclination);
         if(inclination!=Double.NaN){
             if(inclination<89.5) {
               //  Log.e("TACHOMASTER", "Turn left inclination");
