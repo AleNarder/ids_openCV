@@ -11,4 +11,11 @@ public class Mina {
     public Floor.OnFloorPosition getPosition(){return position;}
     public String getColor(){return color;}
 
+    @Override
+    public String toString() {
+        return "Mina{" +
+                "position=" + position.getRow()+","+position.getCol() +
+                ", color='" + color + '\'' +
+                '}';
+    }
 }

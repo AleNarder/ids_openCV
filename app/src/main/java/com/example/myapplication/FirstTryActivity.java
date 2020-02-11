@@ -191,7 +191,6 @@ public class FirstTryActivity extends AppCompatActivity {
             Log.d("AndroidIngSwOpenCV", "OpenCV loaded");
         }
 
-        mOpenCvCameraView = findViewById(R.id.OpenCvView);
 
         /*mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setMaxFrameSize(640, 480);*/
@@ -211,10 +210,10 @@ public class FirstTryActivity extends AppCompatActivity {
 
         startButtonFirst.setOnClickListener(v -> {
 
-            /*setContentView(R.layout.activity_map);
-            Button stopButton2 = findViewById(R.id.stopButton2);
+
+            /*Button stopButton2 = findViewById(R.id.stopButton2);
             stopButton2.setOnClickListener(v2 -> ev3.cancel());
-            ll = findViewById(R.id.linearlayout0);*/
+            //findViewById(R.id.linearlayout0);*/
             //floor = new Floor(n,m, 29.5f ,29.5f);
             nMine = new Integer(String.valueOf(et7.getText()));
             String s1 = et1.getText().toString();
@@ -227,7 +226,9 @@ public class FirstTryActivity extends AppCompatActivity {
 
             Log.e("=============>", posX.toString()+" "+posY.toString()+" "+startDirection);
 
-            floor = new Floor(n,m , 29.7f, 29.7f, posX,posY,startDirection);
+            floor = new Floor(n,m , 30.0f, 30.0f, posX,posY,startDirection);
+            setContentView(R.layout.activity_camera);
+            mOpenCvCameraView = findViewById(R.id.OpenCvView);
             mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
             mOpenCvCameraView.setMaxFrameSize(320, 240);
             cameraListener = new MyCameraListener();
@@ -279,21 +280,13 @@ public class FirstTryActivity extends AppCompatActivity {
 
     /**************************************************************************************************************************/
 
-    /*public void creaMap(int n, int m, int x, int y) {
-        for (int i = 0; i < n; i++)
-            addButton(i, m, x, y);
-    }*/
-
-    public void creaMap(ArrayList<Mina> list, int n, int m){
-        for(int i=0; i<list.size();i++){
-            int x = list.get(i).getPosition().getRow();
-            int y = list.get(i).getPosition().getCol();
-            String color = list.get(i).getColor();
-            addButton(i,m,x,y,color);
+    public void creaMap(ArrayList<Mina> l, int n, int m){
+        for(int i=0;i<n;i++){
+            addButton(l, i, m);
         }
     }
 
-    public void addButton(int n, int m, int x, int y, String col) {
+    public void addButton(ArrayList<Mina> l, int n, int m){
         LinearLayout ll2 = new LinearLayout(this);
         ll2.setOrientation(LinearLayout.HORIZONTAL);
         LinearLayout.LayoutParams ll_params =
@@ -307,24 +300,29 @@ public class FirstTryActivity extends AppCompatActivity {
             LinearLayout.LayoutParams b_params = new LinearLayout.LayoutParams(0, 100, 1);
             btn.setLayoutParams(b_params);
             ll2.addView(btn);
-            btn.setId(cnt);
-            cnt++;
 
-            if (n == x && i == y){
-                switch (col){
-                    case "red":
-                        btn.setBackgroundColor(Color.RED);
-                        break;
-                    case "yellow":
-                        btn.setBackgroundColor(Color.YELLOW);
-                        break;
-                    case "blue":
-                        btn.setBackgroundColor(Color.BLUE);
-                        break;
+            for(int j=0;j<l.size();j++) {
+
+                int x = l.get(j).getPosition().getRow();
+                int y = l.get(j).getPosition().getCol();
+                String color = l.get(j).getColor();
+
+                if (n == x && i == y) {
+                    Log.e("========>","COLORO MINA");
+                    switch (color) {
+                        case "red":
+                            btn.setBackgroundColor(Color.RED);
+                            break;
+                        case "yellow":
+                            btn.setBackgroundColor(Color.YELLOW);
+                            break;
+                        case "blue":
+                            btn.setBackgroundColor(Color.BLUE);
+                            break;
+                    }
+
                 }
-
             }
-
 
             final int x2 = i;
             btn.setOnClickListener(v -> {
@@ -332,18 +330,6 @@ public class FirstTryActivity extends AppCompatActivity {
             });
         }
     }
-
-    public void setColorButton(int x, int y, Button btn) {
-        int cnt = 0;
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
-                cnt++;
-            }
-        }
-        //btn.findViewById(R.id.cnt);
-        btn.setBackgroundColor(Color.RED);
-    }
-
 
     /***************************************************************************************************************************************
      *** NEARBY
@@ -746,15 +732,14 @@ public class FirstTryActivity extends AppCompatActivity {
         } finally {
             Prelude.trap(()->tachoMaster.stopMotors());
 
+            Log.e("TAKE MINE 2 : " , "coordinate : "+floorMaster.getFloor().getActualPosition().getRow()+" "+floorMaster.getFloor().getActualPosition().getCol());
 
-            /*runOnUiThread(() -> {
-                mOpenCvCameraView.disableView();
-                mOpenCvCameraView.setVisibility(SurfaceView.GONE);
-                ll = findViewById(R.id.linearlayout0);
-                ll.removeAllViews();
+            runOnUiThread(() -> {
+                Log.e("LISTA MINE:", mineList.toString());
                 setContentView(R.layout.activity_map);
+                ll = findViewById(R.id.linearlayout0);
                 creaMap(mineList,n,m);
-            });*/
+            });
         }
 
     }
@@ -799,10 +784,10 @@ public class FirstTryActivity extends AppCompatActivity {
             ArrayList<Ball> f = ballFinder.findBalls();
 
             for (Ball b : f) {
-                Log.e("ball", String.valueOf(b.center.x));
+               /* Log.e("ball", String.valueOf(b.center.x));
                 Log.e("ball", String.valueOf(b.center.y));
                 Log.e("ball", String.valueOf(b.radius));
-                Log.e("ball", b.color);
+                Log.e("ball", b.color);*/
                 color = b.color;
             }
             return frame;

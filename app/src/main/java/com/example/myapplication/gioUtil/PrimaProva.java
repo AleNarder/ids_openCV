@@ -117,15 +117,15 @@ public class PrimaProva {
             }
 
             if(motors_going){
-                tachoMaster.moduleSpeed(20,cameraListener.getInclination());
+                tachoMaster.moduleSpeed(15,cameraListener.getInclination());
             }
 
             if (!motors_going && floorMaster.getFloor().getActualPosition().compareTo(newPosition) != 0) {
                 Log.d("PRIMA PROVA 3 : ", "MOTORS GOING ");
                 //tachoMaster.stopMotors();
                 tachoMaster.resetMovementMotorsPosition();
-                tachoMaster.moveStraight(20);
-                tachoMaster.moduleSpeed(20,cameraListener.getInclination());
+                tachoMaster.moveStraight(15);
+                tachoMaster.moduleSpeed(15,cameraListener.getInclination());
                 motors_going = true;
 
             }
@@ -142,7 +142,7 @@ public class PrimaProva {
                     motors_going = false;
                     nowhereToGo = true;
                     Thread.sleep(500);
-                    //tachoMaster.countAdjustment(20, Math.round(tachoMaster.getMotorsCount()), tileDim);
+                    //tachoMaster.countAdjustment(15, Math.round(tachoMaster.getMotorsCount()), tileDim);
                     //tachoMaster.resetMovementMotorsPosition();
                     botMoves.add(new Floor.OnFloorPosition(floorMaster.getFloor().getActualPosition().getRow(), floorMaster.getFloor().getActualPosition().getCol()));
                     Log.e("PRIMA PROVA 3 : ", "POSITION ADDED : " + botMoves.get(botMoves.size() - 1).getRow() + botMoves.get(botMoves.size() - 1).getCol());
@@ -166,7 +166,7 @@ public class PrimaProva {
         tachoMaster.releaseMine(-30,3000);
 
         //tachoMaster.takeMine(-20,3000);
-      //  tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
+        tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
         floorMaster.updateBotPosition();
         floorMaster.updateNextPosition();
         //tachoMaster.takeMine(-20,2000);
@@ -177,7 +177,11 @@ public class PrimaProva {
 
         tachoMaster.resetMovementMotorsPosition();
 
-        return  new Mina(floorMaster.getFloor().getActualPosition(),cameraListener.getColor());
+        Log.e("TAKE MINE : " , "coordinate : "+floorMaster.getFloor().getActualPosition().getRow()+" "+floorMaster.getFloor().getActualPosition().getCol());
+        int x = floorMaster.getFloor().getActualPosition().getRow();
+        int y = floorMaster.getFloor().getActualPosition().getCol();
+        Floor.OnFloorPosition minePos = new Floor.OnFloorPosition(x,y);
+        return  new Mina(minePos,cameraListener.getColor());
     }
 
     public void goToStartPosition() throws InterruptedException, ExecutionException, IOException {
@@ -214,12 +218,12 @@ public class PrimaProva {
             }
 
             if(motors_going){
-                tachoMaster.moduleSpeed(20,cameraListener.getInclination());
+                tachoMaster.moduleSpeed(15,cameraListener.getInclination());
             }
             if(!motors_going && floorMaster.getFloor().getActualPosition().compareTo(newPosition)!=0){
                 tachoMaster.resetMovementMotorsPosition();
-                tachoMaster.moveStraight(20);
-                tachoMaster.moduleSpeed(20,cameraListener.getInclination());
+                tachoMaster.moveStraight(15);
+                tachoMaster.moduleSpeed(15,cameraListener.getInclination());
                 motors_going=true;
             }
             if(tachoMaster.getMotorsCount()>tileDim && motors_going){  /** dovrei avere (grandezza della piastrella *20)+20*/
@@ -229,7 +233,7 @@ public class PrimaProva {
                     tachoMaster.stopMotors();
                     motors_going=false;
                     nowhereToGo=true;
-                    //tachoMaster.countAdjustment(20, Math.round(tachoMaster.getMotorsCount()), tileDim);
+                   // tachoMaster.countAdjustment(15, Math.round(tachoMaster.getMotorsCount()), tileDim);
                     i--;
                 }
 
@@ -250,10 +254,10 @@ public class PrimaProva {
         Floor.TurnDirection turn = floorMaster.turnDirection(d);
         tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
 
-        tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
+        tachoMaster.countAdjustment(15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
         tachoMaster.releaseMine(30,5000);
         tachoMaster.resetMovementMotorsPosition();
-        tachoMaster.countAdjustment(-20,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
+        tachoMaster.countAdjustment(-15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
 
         turn = floorMaster.turnDirection(prevD);
         tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());

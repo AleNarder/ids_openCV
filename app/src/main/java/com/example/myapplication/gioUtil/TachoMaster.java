@@ -339,14 +339,14 @@ public class TachoMaster {
         if(inclination!=Double.NaN){
             if(inclination<89.5) {
               //  Log.e("TACHOMASTER", "Turn left inclination");
-                rightMotor.setSpeed(20+1);
-                leftMotor.setSpeed(20);
+                rightMotor.setSpeed(speed+1);
+                leftMotor.setSpeed(speed);
             }
             else
             if(inclination>90.5) {
               //  Log.e("TACHOMASTER", "Turn right inclination");
-                rightMotor.setSpeed(20);
-                leftMotor.setSpeed(20+1);
+                rightMotor.setSpeed(speed);
+                leftMotor.setSpeed(speed+1);
 
             }
 

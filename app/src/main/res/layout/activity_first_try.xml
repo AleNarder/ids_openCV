@@ -9,15 +9,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:screenOrientation="landscape">
 
-    <org.opencv.android.JavaCameraView
-        android:id="@+id/OpenCvView"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:visibility="gone"
-        opencv:camera_id="any"
-        opencv:show_fps="true" />
 
     <LinearLayout
         android:id="@+id/linearlayout1"
