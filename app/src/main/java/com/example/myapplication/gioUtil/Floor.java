@@ -23,6 +23,14 @@ public class Floor {
             else
                 return 1; //TODO
         }
+
+        @Override
+        public String toString() {
+            return "OnFloorPosition{" +
+                    "i=" + i +
+                    ", j=" + j +
+                    '}';
+        }
     }
 
     private static class Tile {

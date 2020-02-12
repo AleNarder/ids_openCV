@@ -7,6 +7,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.Log;
 
+import com.example.myapplication.FirstTryActivity;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,13 +42,16 @@ public class SecondaProva {
      * bisogna aggiornare floor e dirgli dove stanno le mine!!!!!!!!!!!!!!
      * **/
 
-    Queue<Floor.OnFloorPosition> minePosition; /**lista posizioni mine da raccogliere**/
+    FirstTryActivity.MyCameraListener cameraListener;
+
+    List<Floor.OnFloorPosition> minePosition; /**lista posizioni mine da raccogliere**/
 
     //TODO aggiungere il camera listener + sistemare algoritmo con gli adjust. aggiustare anche appena dopo aver girato?
-    public SecondaProva(Context context , TachoMaster tachoMaster , FloorMaster floorMaster , SensorMaster sensorMaster , Queue<Floor.OnFloorPosition> minePosition){
+    public SecondaProva(Context context , TachoMaster tachoMaster , FloorMaster floorMaster , SensorMaster sensorMaster , List<Floor.OnFloorPosition> minePosition , FirstTryActivity.MyCameraListener cameraListener){
         this.tachoMaster=tachoMaster;
         this.floorMaster=floorMaster;
         this.sensorMaster=sensorMaster;
+        this.cameraListener = cameraListener;
         botMoves=new ArrayList<>();
         tileDim = Math.round(floorMaster.getFloor().getTileWidth()*20+20); /**è la dimensione in step per i motori**/
         this.minePosition=minePosition;
@@ -72,12 +77,14 @@ public class SecondaProva {
         boolean motors_going=false;
         boolean noWhereToGo=true;
         boolean noDestination=true;
+        botMoves.clear();
+        botMoves.add(floorMaster.getFloor().getStartPosition()); /**aggiungo posizione di partenza --> ultima posizione dell'inverso**/
         Floor.OnFloorPosition newPosition = new Floor.OnFloorPosition(-1,-1);
         Floor.OnFloorPosition destination = new Floor.OnFloorPosition(-1,-1);
         while(!sensorMaster.objectInProximity()) {
             if (noDestination) {
                 //TODO sto if potrebbe non servire se alla fine prendo una mina alla volta, posso farlo direttamente quando inizio la funzione
-                destination = minePosition.poll();  //TODO o peek o poll dipende se è meglio non toglierla subito e lasciarla finchè non ho la sicurezza di avere preso la mina
+                destination = minePosition.remove(0);  //TODO o peek o poll dipende se è meglio non toglierla subito e lasciarla finchè non ho la sicurezza di avere preso la mina
                 noDestination = false;
             }
             if (noWhereToGo) {
@@ -93,11 +100,16 @@ public class SecondaProva {
                 tachoMaster.turnBot(10, turn, sensorMaster,20.0);
             }
 
+            if(motors_going){
+                tachoMaster.moduleSpeed(15,cameraListener.getInclination());
+            }
+
             if (!motors_going && floorMaster.getFloor().getActualPosition().compareTo(newPosition) != 0) {
                 Log.d("PRIMA PROVA 3 : ", "MOTORS GOING ");
 
                 tachoMaster.resetMovementMotorsPosition();
-                tachoMaster.moveStraight(30);
+                tachoMaster.moveStraight(15);
+                tachoMaster.moduleSpeed(15,cameraListener.getInclination());
                 motors_going = true;
 
             }
@@ -114,9 +126,10 @@ public class SecondaProva {
                     tachoMaster.stopMotors();
                     motors_going = false;
                     noWhereToGo = true;
-                    Thread.sleep(3000);
-                    tachoMaster.countAdjustment(20, Math.round(tachoMaster.getMotorsCount()), tileDim);
+                    Thread.sleep(1000);
+                    //tachoMaster.countAdjustment(20, Math.round(tachoMaster.getMotorsCount()), tileDim);
                     tachoMaster.resetMovementMotorsPosition();
+
                     botMoves.add(new Floor.OnFloorPosition(floorMaster.getFloor().getActualPosition().getRow(), floorMaster.getFloor().getActualPosition().getCol()));
                     Log.e("PRIMA PROVA 3 : ", "POSITION ADDED : " + botMoves.get(botMoves.size() - 1).getRow() + botMoves.get(botMoves.size() - 1).getCol());
                 }
@@ -130,27 +143,30 @@ public class SecondaProva {
 
 
 
-    public Floor.OnFloorPosition takeMine() throws InterruptedException, ExecutionException, IOException {
+    public Mina takeMine() throws InterruptedException, ExecutionException, IOException {
 
         // tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster);
         // tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
         //tachoMaster.releaseMine(20,3000);
         tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
-        tachoMaster.takeMine(-20,3000);tachoMaster.releaseMine(20,3000);
-
+        tachoMaster.takeMine(30,2000);
+        tachoMaster.releaseMine(-30,3000);
         //tachoMaster.takeMine(-20,3000);
-        //  tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
+        tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
         floorMaster.updateBotPosition();
         floorMaster.updateNextPosition();
         //tachoMaster.takeMine(-20,2000);
-        tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster,20.0);
+       // tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster,20.0);
 
         Log.e("PRIMA PROVA 3 : ", "ACTUALPOSITION :  ROW : "+floorMaster.getFloor().getActualPosition().getRow()+" COL : "+floorMaster.getFloor().getActualPosition().getCol());
 
 
         tachoMaster.resetMovementMotorsPosition();
 
-        return floorMaster.getFloor().getActualPosition();
+        int x = floorMaster.getFloor().getActualPosition().getRow();
+        int y = floorMaster.getFloor().getActualPosition().getCol();
+        Floor.OnFloorPosition minePos = new Floor.OnFloorPosition(x,y);
+        return  new Mina(minePos,cameraListener.getColor());
     }
 
 
@@ -168,7 +184,7 @@ public class SecondaProva {
                 Floor.TurnDirection turn = floorMaster.turnDirection(d);
 
                 //tachoMaster.turnBot(10,163,turn);
-                tachoMaster.turnBot(10,turn,sensorMaster,20.0);
+                tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
 
 
 
@@ -178,10 +194,13 @@ public class SecondaProva {
 
                 nowhereToGo=false;
             }
-
+            if(motors_going){
+                tachoMaster.moduleSpeed(15,cameraListener.getInclination());
+            }
             if(!motors_going && floorMaster.getFloor().getActualPosition().compareTo(newPosition)!=0){
                 tachoMaster.resetMovementMotorsPosition();
-                tachoMaster.moveStraight(30);
+                tachoMaster.moveStraight(15);
+                tachoMaster.moduleSpeed(15,cameraListener.getInclination());
                 motors_going=true;
             }
             if(tachoMaster.getMotorsCount()>tileDim && motors_going){  /** dovrei avere (grandezza della piastrella *20)+20*/
@@ -191,7 +210,7 @@ public class SecondaProva {
                     tachoMaster.stopMotors();
                     motors_going=false;
                     nowhereToGo=true;
-                    tachoMaster.countAdjustment(20, Math.round(tachoMaster.getMotorsCount()), tileDim);
+                    //tachoMaster.countAdjustment(20, Math.round(tachoMaster.getMotorsCount()), tileDim);
                     i--;
                 }
 
@@ -202,6 +221,23 @@ public class SecondaProva {
             }
             /***TOGLIERE LA MOSSA**/
         }
+
+    }
+
+    public void releaseMine() throws InterruptedException, ExecutionException, IOException {
+
+        Floor.Direction prevD = floorMaster.getFloor().getBotDirection();
+        Floor.Direction d = floorMaster.getFloor().safeDirection(floorMaster.floor.getStartPosition());
+        Floor.TurnDirection turn = floorMaster.turnDirection(d);
+        tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
+
+        tachoMaster.countAdjustment(15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
+        tachoMaster.releaseMine(30,5000);
+        tachoMaster.resetMovementMotorsPosition();
+        tachoMaster.countAdjustment(-15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
+
+        turn = floorMaster.turnDirection(prevD);
+        tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
 
     }
 }

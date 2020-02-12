@@ -44,7 +44,7 @@ public class FloorMaster {
             actualPosition=new Floor.OnFloorPosition(destination);
             finalPosition=new Floor.OnFloorPosition(source);
         }
-
+        actualPosition.setOnFloorPosition(actualPosition.getRow(),source.getCol());
         while(actualPosition.getRow()<finalPosition.getRow()){
             if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
                 return false;
@@ -63,6 +63,7 @@ public class FloorMaster {
             actualPosition=new Floor.OnFloorPosition(destination);
             finalPosition=new Floor.OnFloorPosition(source);
         }
+        actualPosition.setOnFloorPosition(source.getRow(),actualPosition.getCol());
         while(actualPosition.getCol()<finalPosition.getCol()){
             if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
                 return false;
