@@ -32,11 +32,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SecondTryActivity"></activity>
-        <activity android:name=".Nearby" />
-        <activity android:name=".FirstTryActivity" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".DispatcherActivity">
+        <activity android:name=".SecondTryActivity"
+            android:screenOrientation="userLandscape"/>
+        <activity android:name=".Nearby"
+            android:screenOrientation="userLandscape"/>
+        <activity android:name=".FirstTryActivity"
+            android:screenOrientation="userLandscape"/>
+        <activity android:name=".MainActivity"
+            android:screenOrientation="userLandscape"/>
+        <activity android:name=".DispatcherActivity"
+            android:screenOrientation="userLandscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

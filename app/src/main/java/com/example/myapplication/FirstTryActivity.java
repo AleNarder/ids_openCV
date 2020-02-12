@@ -306,7 +306,8 @@ public class FirstTryActivity extends AppCompatActivity {
                 int x = l.get(j).getPosition().getRow();
                 int y = l.get(j).getPosition().getCol();
                 String color = l.get(j).getColor();
-
+                if(color==null)
+                    color="green";
                 if (n == x && i == y) {
                     Log.e("========>","COLORO MINA");
                     switch (color) {
@@ -318,6 +319,9 @@ public class FirstTryActivity extends AppCompatActivity {
                             break;
                         case "blue":
                             btn.setBackgroundColor(Color.BLUE);
+                            break;
+                        case "green":
+                            btn.setBackgroundColor(Color.GREEN);
                             break;
                     }
 
