@@ -227,11 +227,12 @@ public class SecondTryActivity extends AppCompatActivity {
 
             Log.e("=============>", posX.toString()+" "+posY.toString()+" "+startDirection);
 
-            floor = new Floor(n,m , 30.0f, 30.0f, posX,posY,startDirection);
+
             posList = convertList(listCoordMines);
             for(int z = 0; z<posList.size();z++){
                 Log.e("SECOND LIST : ",posList.get(z).toString());
             }
+            floor = new Floor(n,m , 30.0f, 30.0f, posX,posY,startDirection,posList);
             setContentView(R.layout.activity_camera);
             mOpenCvCameraView = findViewById(R.id.OpenCvView);
             mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);

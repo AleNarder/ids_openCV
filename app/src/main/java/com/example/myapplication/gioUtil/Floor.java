@@ -54,6 +54,8 @@ public class Floor {
         public boolean getChecked(){return checked;}
         public void setChecked(boolean b){checked = b;}
 
+        public void setMine(boolean b){this.mine=b;}
+
         public float getHeight() {
             return height;
         }
@@ -147,6 +149,39 @@ public class Floor {
 
     }
 
+    public Floor(int width , int height , float tileWidth , float tileHeight, int posX , int posY , Direction dir , List<OnFloorPosition> l){
+        uncheckedTileList = new ArrayList<>();
+
+        field = new Tile[width][height];
+
+        this.width = width;
+        this.height = height;
+
+        for(int i = 0 ; i<width ; i++)
+            for(int j=0;j<height ; j++) {
+                field[i][j] = new Tile(tileWidth, tileHeight, i, j);
+                uncheckedTileList.add(field[i][j]);
+            }
+
+
+        /**TODO**/
+        startPosition = new OnFloorPosition(posX,posY);
+        field[startPosition.getRow()][startPosition.getCol()].setChecked(true);
+        actualPosition = new OnFloorPosition(startPosition.getRow(),startPosition.getCol());
+        prevPosition=new OnFloorPosition(-1,-1);
+        botDirection = BotDirection.getInstance(dir);
+        nextPosition = new OnFloorPosition(actualPosition.getRow()+botDirection.getY(),actualPosition.getCol()+botDirection.getX());
+
+        for(int i=0;i<l.size();i++){
+            int row , col ;
+            row=l.get(i).getRow();
+            col=l.get(i).getCol();
+            field[row][col].setMine(true);
+        }
+
+
+    }
+
     public Direction safeDirection(OnFloorPosition pos){
         Direction[] allDirections = Direction.class.getEnumConstants();
         BotDirection tempDirection = new BotDirection(Direction.VERTICAL_UP);
@@ -184,6 +219,7 @@ public class Floor {
     }
 
     public boolean getMine(OnFloorPosition pos){return field[pos.getRow()][pos.getCol()].getMine();}
+    public void setMine(OnFloorPosition pos , boolean b){field[pos.getRow()][pos.getCol()].setMine(b);}
     public boolean getChecked(OnFloorPosition pos){return field[pos.getRow()][pos.getCol()].getChecked();}
 
     public Direction getBotDirection(){return botDirection.getDirection();}

@@ -166,6 +166,7 @@ public class SecondaProva {
         int x = floorMaster.getFloor().getActualPosition().getRow();
         int y = floorMaster.getFloor().getActualPosition().getCol();
         Floor.OnFloorPosition minePos = new Floor.OnFloorPosition(x,y);
+        floorMaster.getFloor().setMine(minePos,false);
         return  new Mina(minePos,cameraListener.getColor());
     }
 
