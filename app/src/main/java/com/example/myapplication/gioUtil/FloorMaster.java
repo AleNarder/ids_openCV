@@ -17,79 +17,254 @@ public class FloorMaster {
     public Floor.OnFloorPosition chooseNextPosition (Floor.OnFloorPosition destination) throws Exception {
         if(floor.getActualPosition().compareTo(destination)!=0){
             if(floor.getActualPosition().getRow()!=destination.getRow()){
-                if(freeRowRoad(floor.getActualPosition(),destination)){  //TODO per riga e colonna
+                if(freeRowRoadaux(floor.getActualPosition(),destination)){  //TODO per riga e colonna
+                    Log.e("FLOOR MASTER : ", "free row");
                     return new Floor.OnFloorPosition(destination.getRow(),floor.getActualPosition().getCol());
                 }
             }
-            else{
-                if(floor.getActualPosition().getCol()!=destination.getCol()){
-                    if(freeColRoad(floor.getActualPosition(),destination)){
+
+            if(floor.getActualPosition().getCol()!=destination.getCol()){
+                    if(freeColRoadaux(floor.getActualPosition(),destination)){
+                        Log.e("FLOOR MASTER : ", "free col");
+
                         return new Floor.OnFloorPosition(floor.getActualPosition().getRow(),destination.getCol());
                     }
-                }
             }
-            return chooseOneTileMove(floor.getActualPosition());
+            Log.e("FLOOR MASTER : ", "null");
+
+            return null;
         }
         else
             return destination;
     }
 
     private boolean freeRowRoad(Floor.OnFloorPosition source, Floor.OnFloorPosition destination) {
+        if(source.compareTo(destination)==0) {
+            Log.e("FLOOR MASTER :"," RESSSSSS:"+destination.getRow()+" "+destination.getCol());
+            return true;
+        }
         Floor.OnFloorPosition actualPosition , finalPosition;
         if(source.getRow()<destination.getRow()){
             actualPosition=new Floor.OnFloorPosition(source);
             finalPosition= new Floor.OnFloorPosition(destination);
+            if(!floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                return false;
+            while(actualPosition.getRow()!=finalPosition.getRow()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow()+1,actualPosition.getCol());
+                if(!floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return freeColRoad(actualPosition,finalPosition);
+
         }
         else{
-            actualPosition=new Floor.OnFloorPosition(destination);
-            finalPosition=new Floor.OnFloorPosition(source);
-        }
-        actualPosition.setOnFloorPosition(actualPosition.getRow(),source.getCol());
-        while(actualPosition.getRow()<finalPosition.getRow()){
-            if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+            actualPosition=new Floor.OnFloorPosition(source);
+            finalPosition=new Floor.OnFloorPosition(destination);
+            if(!floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
                 return false;
-            actualPosition.setOnFloorPosition(actualPosition.getRow()+1,actualPosition.getCol());
+            while(actualPosition.getRow()!=finalPosition.getRow()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow()-1,actualPosition.getCol());
+                if(!floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return freeColRoad(actualPosition,finalPosition);
         }
-        return true;
+
     }
 
     private boolean freeColRoad(Floor.OnFloorPosition source, Floor.OnFloorPosition destination) {
+        if(source.compareTo(destination)==0) {
+            Log.e("FLOOR MASTER :"," RESSSSSS:"+destination.getRow()+" "+destination.getCol());
+
+            return true;
+        }
         Floor.OnFloorPosition actualPosition , finalPosition;
         if(source.getCol()<destination.getCol()){
             actualPosition=new Floor.OnFloorPosition(source);
             finalPosition= new Floor.OnFloorPosition(destination);
+            if(!floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                return false;
+            while(actualPosition.getCol()!=finalPosition.getCol()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow(),actualPosition.getCol()+1);
+                if(!floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return freeRowRoad(actualPosition,finalPosition);
         }
         else{
-            actualPosition=new Floor.OnFloorPosition(destination);
-            finalPosition=new Floor.OnFloorPosition(source);
-        }
-        actualPosition.setOnFloorPosition(source.getRow(),actualPosition.getCol());
-        while(actualPosition.getCol()<finalPosition.getCol()){
-            if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+            actualPosition=new Floor.OnFloorPosition(source);
+            finalPosition=new Floor.OnFloorPosition(destination);
+            if(!floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
                 return false;
-            actualPosition.setOnFloorPosition(actualPosition.getRow(),actualPosition.getCol()+1);
+            while(actualPosition.getCol()!=finalPosition.getCol()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow(),actualPosition.getCol()-1);
+                if(!floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return freeRowRoad(actualPosition,finalPosition);
         }
-        return true;
 
     }
 
-    public Floor.OnFloorPosition chooseOneTileMove(Floor.OnFloorPosition source ) throws Exception {
+    private boolean freeRowRoadaux(Floor.OnFloorPosition source, Floor.OnFloorPosition destination) {
+        if(source.compareTo(destination)==0) {
+            Log.e("FLOOR MASTER :"," RESSSSSS:"+destination.getRow()+" "+destination.getCol());
+            return true;
+        }
+        Floor.OnFloorPosition actualPosition , finalPosition;
+        if(source.getRow()<destination.getRow()){
+            actualPosition=new Floor.OnFloorPosition(source);
+            finalPosition= new Floor.OnFloorPosition(destination);
+            if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                return false;
+            while(actualPosition.getRow()!=finalPosition.getRow()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow()+1,actualPosition.getCol());
+                if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return freeColRoad(actualPosition,finalPosition);
+
+        }
+        else{
+            actualPosition=new Floor.OnFloorPosition(source);
+            finalPosition=new Floor.OnFloorPosition(destination);
+            if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                return false;
+            while(actualPosition.getRow()!=finalPosition.getRow()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow()-1,actualPosition.getCol());
+                if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return freeColRoad(actualPosition,finalPosition);
+        }
+
+    }
+
+    private boolean freeColRoadaux(Floor.OnFloorPosition source, Floor.OnFloorPosition destination) {
+        if(source.compareTo(destination)==0) {
+            Log.e("FLOOR MASTER :"," RESSSSSS:"+destination.getRow()+" "+destination.getCol());
+
+            return true;
+        }
+        Floor.OnFloorPosition actualPosition , finalPosition;
+        if(source.getCol()<destination.getCol()){
+            actualPosition=new Floor.OnFloorPosition(source);
+            finalPosition= new Floor.OnFloorPosition(destination);
+            if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                return false;
+            while(actualPosition.getCol()!=finalPosition.getCol()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow(),actualPosition.getCol()+1);
+                if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return freeRowRoad(actualPosition,finalPosition);
+        }
+        else{
+            actualPosition=new Floor.OnFloorPosition(source);
+            finalPosition=new Floor.OnFloorPosition(destination);
+            if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                return false;
+            while(actualPosition.getCol()!=finalPosition.getCol()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow(),actualPosition.getCol()-1);
+                if(floor.getMine(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return freeRowRoad(actualPosition,finalPosition);
+        }
+
+    }
+
+    public void destinationMeth(Floor.OnFloorPosition s , Floor.OnFloorPosition d , Floor.OnFloorPosition res){
+        Floor.OnFloorPosition source = new Floor.OnFloorPosition(s);
+        Floor.OnFloorPosition destination = new Floor.OnFloorPosition(d);
+        floor.setChecked(source,true);
+        floor.setChecked(destination,true);
+        Floor.OnFloorPosition temp;
+
+        if(freeRowRoad(source,destination)){
+            res.setOnFloorPosition(destination.getRow(),destination.getCol());
+
+        }
+        else{
+            if(freeColRoad(source,destination)){
+                res.setOnFloorPosition(destination.getRow(),destination.getCol());
+            }
+            else{
+                temp = new Floor.OnFloorPosition(destination.getRow()+1,destination.getCol());
+                if(floor.isSafe(temp) && temp.compareTo(source)!=0 && res.compareTo(new Floor.OnFloorPosition(-1,-1))==0 && !floor.getChecked(temp)) {
+                    Log.e("FLOOR MASTER :"," PROVO POS :"+temp.getRow()+" "+temp.getCol());
+                    destinationMeth(source, temp, res);
+                }
+
+                temp=new Floor.OnFloorPosition(destination.getRow()-1,destination.getCol());
+                if(floor.isSafe(temp) && temp.compareTo(source)!=0 && res.compareTo(new Floor.OnFloorPosition(-1,-1))==0 && !floor.getChecked(temp)) {
+                    Log.e("FLOOR MASTER :"," PROVO POS :"+temp.getRow()+" "+temp.getCol());
+
+                    destinationMeth(source, temp, res);
+                }
+
+                temp = new Floor.OnFloorPosition(destination.getRow(),destination.getCol()+1);
+                if(floor.isSafe(temp) && temp.compareTo(source)!=0 && res.compareTo(new Floor.OnFloorPosition(-1,-1))==0 && !floor.getChecked(temp)) {
+                    Log.e("FLOOR MASTER :", " PROVO POS :" + temp.getRow() + " " + temp.getCol());
+
+                    destinationMeth(source, temp, res);
+                }
+
+                temp = new Floor.OnFloorPosition(destination.getRow(),destination.getCol()-1);
+                if(floor.isSafe(temp) && temp.compareTo(source)!=0 && res.compareTo(new Floor.OnFloorPosition(-1,-1))==0 && !floor.getChecked(temp)) {
+                    Log.e("FLOOR MASTER :"," PROVO POS :"+temp.getRow()+" "+temp.getCol());
+                    destinationMeth(source, temp, res);
+                }
+
+                else return;
+            }
+        }
+    }
+
+    public Floor.OnFloorPosition chooseOneTileMove(Floor.OnFloorPosition source, Floor.OnFloorPosition destination) throws Exception {
         List<Floor.Direction> dir = new ArrayList<>();
         Floor.OnFloorPosition temp = new Floor.OnFloorPosition(-1,-1);
         Floor.BotDirection bt = new Floor.BotDirection(floor.getBotDirection());
+        Floor.BotDirection noDir = new Floor.BotDirection(oppDir(floor.getBotDirection()));
         dir.add(Floor.Direction.HORIZONTAL_DOWN); dir.add(Floor.Direction.HORIZONTAL_UP); dir.add(Floor.Direction.VERTICAL_DOWN); dir.add(Floor.Direction.VERTICAL_UP);
-        for(int i=0;i<dir.size();i++){
-            bt.setDirection(dir.get(i));
-            temp.setOnFloorPosition(source.getRow()+bt.getY(),source.getCol()+bt.getX());
-            if(!notThatWay(temp,bt) && !floor.getMine(temp))
+        Floor.Direction bestDir = bestDirection(source,destination);
+        if(bestDir!=null && bestDir!=noDir.getDirection()){
+            bt.setDirection(bestDir);
+            temp.setOnFloorPosition(source.getRow() + bt.getY(), source.getCol() + bt.getX());
+            if (!notThatWay(temp) && !floor.getMine(temp))
                 return temp;
         }
+        for(int i=0;i<dir.size();i++){
+            if(dir.get(i)!=noDir.getDirection()) {
+                bt.setDirection(dir.get(i));
+                temp.setOnFloorPosition(source.getRow() + bt.getY(), source.getCol() + bt.getX());
+                if (!notThatWay(temp) && !floor.getMine(temp))
+                    return temp;
+            }
+        }
+        bt.setDirection(noDir.getDirection());
+        temp.setOnFloorPosition(source.getRow() + bt.getY(), source.getCol() + bt.getX());
+        if (!notThatWay(temp) && !floor.getMine(temp))
+            return temp;
         throw new Exception(); //TODO
     }
-
-    private boolean notThatWay(Floor.OnFloorPosition pos , Floor.BotDirection bt){
+    private Floor.Direction bestDirection(Floor.OnFloorPosition source , Floor.OnFloorPosition destination){
+        int rowDiff = source.getRow()-destination.getRow();
+        if(rowDiff>0)
+            return Floor.Direction.VERTICAL_DOWN;
+        if(rowDiff<0)
+            return Floor.Direction.VERTICAL_UP;
+        int colDiff = source.getCol()-destination.getCol();
+        if(colDiff>0)
+            return Floor.Direction.HORIZONTAL_DOWN;
+        if(colDiff<0)
+            return Floor.Direction.HORIZONTAL_UP;
+        else
+            return null;
+    }
+    private boolean notThatWay(Floor.OnFloorPosition pos){
         Floor.OnFloorPosition temp=new Floor.OnFloorPosition(pos.getRow(),pos.getCol());
-        temp.setOnFloorPosition(temp.getRow()+bt.getY(),temp.getCol()+bt.getY());
+        //temp.setOnFloorPosition(temp.getRow()+bt.getY(),temp.getCol()+bt.getY());
 
         if((temp.getRow()<0 || temp.getRow()>=floor.getWidth()) || (temp.getCol()<0 || temp.getCol()>= floor.getHeight()))
             return true;
@@ -282,18 +457,29 @@ public class FloorMaster {
         if(source.getRow()<destination.getRow()){
             actualPosition=new Floor.OnFloorPosition(source);
             finalPosition= new Floor.OnFloorPosition(destination);
+            if(floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                return false;
+            while(actualPosition.getRow()!=finalPosition.getRow()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow()+1,actualPosition.getCol());
+                if(floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return colVisitedInv(actualPosition,finalPosition);
+
         }
         else{
-            actualPosition=new Floor.OnFloorPosition(destination);
-            finalPosition=new Floor.OnFloorPosition(source);
-        }
-        actualPosition.setOnFloorPosition(actualPosition.getRow(),source.getCol());
-        while(actualPosition.getRow()<finalPosition.getRow()){
-            if(!floor.getChecked(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+            actualPosition=new Floor.OnFloorPosition(source);
+            finalPosition=new Floor.OnFloorPosition(destination);
+            if(floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
                 return false;
-            actualPosition.setOnFloorPosition(actualPosition.getRow()+1,actualPosition.getCol());
+            while(actualPosition.getRow()!=finalPosition.getRow()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow()-1,actualPosition.getCol());
+                if(floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return colVisitedInv(actualPosition,finalPosition);
         }
-        return colVisitedInv(actualPosition,finalPosition);
+
     }
 
     private boolean colVisitedInv(Floor.OnFloorPosition source, Floor.OnFloorPosition destination) {
@@ -303,18 +489,28 @@ public class FloorMaster {
         if(source.getCol()<destination.getCol()){
             actualPosition=new Floor.OnFloorPosition(source);
             finalPosition= new Floor.OnFloorPosition(destination);
+            if(floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                return false;
+            while(actualPosition.getCol()!=finalPosition.getCol()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow(),actualPosition.getCol()+1);
+                if(floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return rowVisitedInv(actualPosition,finalPosition);
         }
         else{
-            actualPosition=new Floor.OnFloorPosition(destination);
-            finalPosition=new Floor.OnFloorPosition(source);
-        }
-        actualPosition.setOnFloorPosition(source.getRow(),actualPosition.getCol());
-        while(actualPosition.getCol()<finalPosition.getCol()){
-            if(!floor.getChecked(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+            actualPosition=new Floor.OnFloorPosition(source);
+            finalPosition=new Floor.OnFloorPosition(destination);
+            if(floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
                 return false;
-            actualPosition.setOnFloorPosition(actualPosition.getRow(),actualPosition.getCol()+1);
+            while(actualPosition.getCol()!=finalPosition.getCol()){
+                actualPosition.setOnFloorPosition(actualPosition.getRow(),actualPosition.getCol()-1);
+                if(floor.isSafe(actualPosition) && actualPosition.compareTo(finalPosition)!=0)
+                    return false;
+            }
+            return rowVisitedInv(actualPosition,finalPosition);
         }
-        return rowVisitedInv(actualPosition,finalPosition);
+
     }
 
     public Floor.OnFloorPosition chooseNextPositionInv (Floor.OnFloorPosition destination)  {
@@ -335,6 +531,20 @@ public class FloorMaster {
         }
         else
             return destination;
+    }
+
+    public Floor.Direction oppDir(Floor.Direction dir){
+        switch(dir){
+            case HORIZONTAL_UP:
+                return Floor.Direction.HORIZONTAL_DOWN;
+            case HORIZONTAL_DOWN:
+                return Floor.Direction.HORIZONTAL_UP;
+            case VERTICAL_UP:
+                return Floor.Direction.VERTICAL_DOWN;
+            case VERTICAL_DOWN:
+                return Floor.Direction.VERTICAL_UP;
+            default: return null;
+        }
     }
 
     public static class AllPositionVisited extends Exception{} //TODO : printstack

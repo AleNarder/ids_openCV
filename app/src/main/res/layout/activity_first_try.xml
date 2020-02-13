@@ -130,7 +130,7 @@
             android:id="@+id/editText7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:hint="numero di mine" />
+            android:hint="n" />
 
     </LinearLayout>
 
@@ -143,7 +143,7 @@
         <TextView
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="Posizione robot"
+            android:text="Direzione robot"
             android:textSize="20sp" />
 
         <Spinner
@@ -155,67 +155,5 @@
 
     </LinearLayout>
 
-
-
-    <LinearLayout
-        android:id="@+id/linearlayout8"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/discoveryButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="discovery" />
-
-        <Button
-            android:id="@+id/disconnectButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="disconnect" />
-
-        <Button
-            android:id="@+id/sendButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="send" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/statoConnesione"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/idRobot"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:hint="id robot" />
-
-        <EditText
-            android:id="@+id/key"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
-            android:hint="chiave" />
-
-
-    </LinearLayout>
 </LinearLayout>
 </ScrollView>

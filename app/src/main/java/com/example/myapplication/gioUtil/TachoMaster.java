@@ -173,6 +173,7 @@ public class TachoMaster {
 
     public void uInversionTurn(int speed , SensorMaster sensorMaster) throws InterruptedException, ExecutionException, IOException {
         turnNinetyRight(speed, sensorMaster);
+        Thread.sleep(2000);
         turnNinetyRight(speed,sensorMaster);
     }
 

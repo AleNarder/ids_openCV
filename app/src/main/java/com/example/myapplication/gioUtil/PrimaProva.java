@@ -256,7 +256,7 @@ public class PrimaProva {
 
         tachoMaster.countAdjustment(15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
         tachoMaster.releaseMine(30,5000);
-        tachoMaster.resetMovementMotorsPosition();
+        //tachoMaster.resetMovementMotorsPosition();
         tachoMaster.countAdjustment(-15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
 
         turn = floorMaster.turnDirection(prevD);

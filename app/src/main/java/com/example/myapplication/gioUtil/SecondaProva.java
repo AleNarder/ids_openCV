@@ -77,27 +77,40 @@ public class SecondaProva {
         boolean motors_going=false;
         boolean noWhereToGo=true;
         boolean noDestination=true;
+        boolean noMiddleDestination=true;
         botMoves.clear();
         botMoves.add(floorMaster.getFloor().getStartPosition()); /**aggiungo posizione di partenza --> ultima posizione dell'inverso**/
         Floor.OnFloorPosition newPosition = new Floor.OnFloorPosition(-1,-1);
         Floor.OnFloorPosition destination = new Floor.OnFloorPosition(-1,-1);
+        Floor.OnFloorPosition middleDestination = new Floor.OnFloorPosition(-1,-1);
+
         while(!sensorMaster.objectInProximity()) {
             if (noDestination) {
                 //TODO sto if potrebbe non servire se alla fine prendo una mina alla volta, posso farlo direttamente quando inizio la funzione
                 destination = minePosition.remove(0);  //TODO o peek o poll dipende se è meglio non toglierla subito e lasciarla finchè non ho la sicurezza di avere preso la mina
                 noDestination = false;
             }
+            if(noMiddleDestination) {
+                floorMaster.getFloor().setCheckedForAll(false);
+                middleDestination.setOnFloorPosition(-1, -1);
+                floorMaster.destinationMeth(floorMaster.getFloor().getActualPosition(), destination, middleDestination);
+                Log.e("PRIMA PROVA 3 : ", "MIDDLE :  ROW : " + middleDestination.getRow() + " COL : " + middleDestination.getCol());
+
+                noMiddleDestination = false;
+            }
             if (noWhereToGo) {
-                newPosition = floorMaster.chooseNextPosition(destination);
+                Log.e("SECONDA PROVA :","NOWHERE");
+                newPosition = floorMaster.chooseNextPosition(middleDestination);
                 noWhereToGo = false;
                 tachoMaster.resetMovementMotorsPosition();
                 Floor.Direction d = floorMaster.changeBotDirection(newPosition);
 
                 Floor.TurnDirection turn = floorMaster.turnDirection(d);
 
+                floorMaster.getFloor().setDestination(newPosition,true);
 
                 //tachoMaster.turnBot(10, 163, turn);
-                tachoMaster.turnBot(10, turn, sensorMaster,20.0);
+                tachoMaster.turnBot(10, turn, sensorMaster, 20.0);
             }
 
             if(motors_going){
@@ -122,6 +135,10 @@ public class SecondaProva {
                 Log.e("PRIMA PROVA 3 : ", "ACTUALPOSITION :  ROW : " + floorMaster.getFloor().getActualPosition().getRow() + " COL : " + floorMaster.getFloor().getActualPosition().getCol());
 
                 if (floorMaster.getFloor().getActualPosition().compareTo(newPosition) == 0) {
+                    if(floorMaster.getFloor().getActualPosition().compareTo((middleDestination))==0) {
+                        noMiddleDestination = true;
+                        floorMaster.getFloor().setDestinationForAll(false);
+                    }
                     Log.e("PRIMA PROVA 3 : ", "STOPPING MOTORS");
                     tachoMaster.stopMotors();
                     motors_going = false;
@@ -148,11 +165,11 @@ public class SecondaProva {
         // tachoMaster.turnBot(10, Floor.TurnDirection.U_INVERSION,sensorMaster);
         // tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
         //tachoMaster.releaseMine(20,3000);
-        tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
+        tachoMaster.countAdjustment(15,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
         tachoMaster.takeMine(30,2000);
         tachoMaster.releaseMine(-30,3000);
         //tachoMaster.takeMine(-20,3000);
-        tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
+        //tachoMaster.countAdjustment(20,Math.round(tachoMaster.getMotorsCount()),630 ); //TODO
         floorMaster.updateBotPosition();
         floorMaster.updateNextPosition();
         //tachoMaster.takeMine(-20,2000);
@@ -234,7 +251,7 @@ public class SecondaProva {
 
         tachoMaster.countAdjustment(15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
         tachoMaster.releaseMine(30,5000);
-        tachoMaster.resetMovementMotorsPosition();
+       // tachoMaster.resetMovementMotorsPosition();
         tachoMaster.countAdjustment(-15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
 
         turn = floorMaster.turnDirection(prevD);

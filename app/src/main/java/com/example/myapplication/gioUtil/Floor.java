@@ -39,7 +39,7 @@ public class Floor {
         private OnFloorPosition position;
         private boolean mine; //TODO BISOGNA METTERE IL COLORE __> FARE CLASSE MINE
         private boolean checked;
-
+        private boolean destination;
 
         public Tile ( float width , float height , int onFloorRaw , int onFloorCol){
             setHeight(height);
@@ -49,7 +49,13 @@ public class Floor {
             position = new OnFloorPosition(onFloorRaw, onFloorCol);
             checked=false;
             mine=false;
+            destination = false;
         }
+
+        public void setDestination(boolean destination) {
+            this.destination = destination;
+        }
+        public boolean getDestination(){return this.destination;}
 
         public boolean getChecked(){return checked;}
         public void setChecked(boolean b){checked = b;}
@@ -182,6 +188,32 @@ public class Floor {
 
     }
 
+    public boolean isSafe(OnFloorPosition p){
+        return (p.getRow()>=0 && p.getRow()<getWidth() &&
+                p.getCol()>=0 && p.getCol()<getHeight()) &&
+                !field[p.getRow()][p.getCol()].getMine() &&
+                !field[p.getRow()][p.getCol()].getDestination();
+    }
+
+    public void setCheckedForAll(boolean value){
+        for(int i=0;i<getWidth();i++)
+            for(int j=0;j<getHeight();j++)
+                field[i][j].setChecked(value);
+    }
+
+    public void setDestinationForAll(boolean value){
+        for(int i=0;i<getWidth();i++)
+            for(int j=0;j<getHeight();j++)
+                field[i][j].setDestination(value);
+    }
+
+    public void setChecked(OnFloorPosition pos , boolean value){
+        field[pos.getRow()][pos.getCol()].setChecked(value);
+    }
+
+    public void setDestination(OnFloorPosition pos, boolean value){
+        field[pos.getRow()][pos.getCol()].setDestination(value);
+    }
     public Direction safeDirection(OnFloorPosition pos){
         Direction[] allDirections = Direction.class.getEnumConstants();
         BotDirection tempDirection = new BotDirection(Direction.VERTICAL_UP);

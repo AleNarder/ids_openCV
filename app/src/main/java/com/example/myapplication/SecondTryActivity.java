@@ -134,7 +134,7 @@ public class SecondTryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first_try);
+        setContentView(R.layout.activity_second_try);
 
         startButtonFirst = findViewById(R.id.startButtonFirst);
         stopButtonFirst = findViewById(R.id.stopButtonFirst);
@@ -312,7 +312,8 @@ public class SecondTryActivity extends AppCompatActivity {
                 int x = l.get(j).getPosition().getRow();
                 int y = l.get(j).getPosition().getCol();
                 String color = l.get(j).getColor();
-
+                if(color==null)
+                    color="green";
                 if (n == x && i == y) {
                     Log.e("========>","COLORO MINA");
                     switch (color) {
@@ -325,6 +326,9 @@ public class SecondTryActivity extends AppCompatActivity {
                         case "blue":
                             btn.setBackgroundColor(Color.BLUE);
                             break;
+                        case "green":
+                            btn.setBackgroundColor(Color.GREEN);
+                            break;
                     }
 
                 }
@@ -332,7 +336,7 @@ public class SecondTryActivity extends AppCompatActivity {
 
             final int x2 = i;
             btn.setOnClickListener(v -> {
-               // Toast.makeText(FirstTryActivity.this, "["+n+","+x2+"]", Toast.LENGTH_LONG).show();
+               Toast.makeText(SecondTryActivity.this, "["+n+","+x2+"]", Toast.LENGTH_LONG).show();
             });
         }
     }
@@ -566,6 +570,8 @@ public class SecondTryActivity extends AppCompatActivity {
 
                     Log.e("MotionStop ====>",MyMotionStop.toString());
                     Log.e("Mine ====>", listCoordMines.toString());
+                    Toast.makeText(SecondTryActivity.this,""+listCoordMines.size(),Toast.LENGTH_SHORT).show();
+
 
                 }
 
@@ -654,6 +660,7 @@ public class SecondTryActivity extends AppCompatActivity {
 
         SecondaProva test = new SecondaProva(getApplicationContext(),tachoMaster,floorMaster,sensorMaster,posList,cameraListener);
         int mine = posList.size();
+        Log.e("TASK","" + mine);
         try {
             while (!ev3.isCancelled() && mine>0 ) {
 
