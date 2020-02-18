@@ -104,6 +104,7 @@ public class SecondTryActivity extends AppCompatActivity {
     public String AllResume = "0START";
     public String coordinata = "Coordinate obiettivo";
     public String coordinateRecupero = "Coordinate recupero";
+    public Floor.Coordinate_System axisSystem;
 
     FirstTryActivity.MyCameraListener cameraListener;
 
@@ -137,16 +138,12 @@ public class SecondTryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_second_try);
 
         startButtonFirst = findViewById(R.id.startButtonFirst);
-        stopButtonFirst = findViewById(R.id.stopButtonFirst);
         discButton = findViewById(R.id.discoveryButton);
         disconnectButton = findViewById(R.id.disconnectButton);
         //showMex = findViewById(R.id.button5);
-        sendButton = findViewById(R.id.sendButton);
 
         et1 = findViewById(R.id.editText1);
         et2 = findViewById(R.id.editText2);
-        et3 = findViewById(R.id.key);
-        et4 = findViewById(R.id.idRobot);
         et5 = findViewById(R.id.editText5);
         et6 = findViewById(R.id.editText6);
 
@@ -160,14 +157,8 @@ public class SecondTryActivity extends AppCompatActivity {
             Toast.makeText(this, "ERRORE", Toast.LENGTH_SHORT).show();
 
         discButton.setOnClickListener(v -> {
-            chiave = et3.getText().toString();
-            id = et4.getText().toString();
             startDiscovery();
         });
-
-        /*showMex.setOnClickListener(v -> {
-            tv2.setText(listCoordMines.toString());
-        });*/
 
         disconnectButton.setOnClickListener(v -> {
             connectionsClient.stopDiscovery();
@@ -175,15 +166,6 @@ public class SecondTryActivity extends AppCompatActivity {
             connectionsClient.stopAllEndpoints();
             tv1.setText("non connesso");
             tv1.setTextColor(Color.RED);
-        });
-
-        sendButton.setOnClickListener(v -> {
-            sendMyPayLoad(welcome);
-            /*try{
-               sendMyCryptoPayLoad("Operazione in corso:4;8;", chiave);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
         });
 
         if (!OpenCVLoader.initDebug()) {
@@ -232,7 +214,7 @@ public class SecondTryActivity extends AppCompatActivity {
             for(int z = 0; z<posList.size();z++){
                 Log.e("SECOND LIST : ",posList.get(z).toString());
             }
-            floor = new Floor(n,m , 30.0f, 30.0f, posX,posY,startDirection,posList);
+            floor = new Floor(n,m , 30.0f, 30.0f, posX,posY,startDirection,posList,axisSystem);
             setContentView(R.layout.activity_camera);
             mOpenCvCameraView = findViewById(R.id.OpenCvView);
             mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
@@ -249,8 +231,6 @@ public class SecondTryActivity extends AppCompatActivity {
             Prelude.trap(() -> ev3.run(this::ev3Task3));
 
         });
-
-        stopButtonFirst.setOnClickListener(v -> ev3.cancel());
 
         Spinner spin = findViewById(R.id.spinner);
 
@@ -281,6 +261,30 @@ public class SecondTryActivity extends AppCompatActivity {
             }
         });
 
+        Spinner spin2 = findViewById(R.id.spinner2);
+
+        spin2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String s = parent.getSelectedItem().toString();
+                switch(s){
+                    case "Y/X":
+                        axisSystem = Floor.Coordinate_System.CARTESIAN;
+                        break;
+                    case "X/Y":
+                        axisSystem = Floor.Coordinate_System.MATRIX;
+
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
     }
 
 
@@ -303,7 +307,7 @@ public class SecondTryActivity extends AppCompatActivity {
         for (int i = 0; i < m; i++) {
             Button btn = new Button(this);
 
-            LinearLayout.LayoutParams b_params = new LinearLayout.LayoutParams(0, 100, 1);
+            LinearLayout.LayoutParams b_params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1);
             btn.setLayoutParams(b_params);
             ll2.addView(btn);
 
@@ -311,6 +315,7 @@ public class SecondTryActivity extends AppCompatActivity {
 
                 int x = l.get(j).getPosition().getRow();
                 int y = l.get(j).getPosition().getCol();
+                btn.setText(""+n+","+i);
                 String color = l.get(j).getColor();
                 if(color==null)
                     color="green";
@@ -498,7 +503,8 @@ public class SecondTryActivity extends AppCompatActivity {
                         }
                         else {
                             if (s.equals(AllStop)){
-                                ev3.cancel();
+                               // ev3.cancel();
+
                                 Log.e(TAG1,s);
                                 MyMotionStop.add(s);
                             }
@@ -688,11 +694,12 @@ public class SecondTryActivity extends AppCompatActivity {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (FloorMaster.AllPositionVisited allPositionVisited) {
-            allPositionVisited.printStackTrace();
-            Log.d("PRIMA PROVA : " , "Tutto il campo è stato visitato");
-        } catch (Exception e) {
+        }
+        catch (SecondaProva.N_ReachableException e) {
             e.printStackTrace();
+            Toast.makeText(this, "Posizione ("+posList.get(0).getRow()+","+posList.get(0).getCol()+") non raggiungibile", Toast.LENGTH_SHORT).show();
+
+
         } finally {
             Prelude.trap(()->tachoMaster.stopMotors());
 

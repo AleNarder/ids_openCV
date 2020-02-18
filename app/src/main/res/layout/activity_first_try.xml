@@ -20,13 +20,6 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/stopButtonFirst"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Stop" />
-
-        <Button
             android:id="@+id/startButtonFirst"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -47,6 +40,10 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <LinearLayout
         android:id="@+id/linearlayout2"
         android:layout_width="match_parent"
@@ -54,7 +51,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="Dimensione campo  "
             android:textSize="20sp" />
@@ -81,6 +78,10 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <LinearLayout
         android:id="@+id/linearlayout7"
         android:layout_width="match_parent"
@@ -88,7 +89,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="Posizione robot  "
             android:textSize="20sp" />
@@ -115,15 +116,19 @@
 
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="Mine  "
+            android:text="Minne  "
             android:textSize="20sp" />
 
         <EditText
@@ -133,6 +138,10 @@
             android:hint="n" />
 
     </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <LinearLayout
         android:id="@+id/linearlayout6"
@@ -152,6 +161,30 @@
             android:layout_height="wrap_content"
             android:background="@android:drawable/btn_dropdown"
             android:entries="@array/position" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="Assi Riga/Colonna"
+            android:textSize="20sp" />
+
+        <Spinner
+            android:id="@+id/spinner2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/btn_dropdown"
+            android:entries="@array/system" />
 
     </LinearLayout>
 

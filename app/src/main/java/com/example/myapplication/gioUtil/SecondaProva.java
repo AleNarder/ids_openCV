@@ -73,7 +73,7 @@ public class SecondaProva {
         sensorManager.registerListener(sensorListener, smartphone_gyro , sensorManager.SENSOR_DELAY_FASTEST);
     }
 
-    public void findMine() throws Exception {
+    public void findMine() throws InterruptedException, ExecutionException, IOException, N_ReachableException {
         boolean motors_going=false;
         boolean noWhereToGo=true;
         boolean noDestination=true;
@@ -97,6 +97,8 @@ public class SecondaProva {
                 Log.e("PRIMA PROVA 3 : ", "MIDDLE :  ROW : " + middleDestination.getRow() + " COL : " + middleDestination.getCol());
 
                 noMiddleDestination = false;
+                if(middleDestination.compareTo(new Floor.OnFloorPosition(-1,-1))==0)
+                    throw new N_ReachableException();
             }
             if (noWhereToGo) {
                 Log.e("SECONDA PROVA :","NOWHERE");
@@ -105,7 +107,7 @@ public class SecondaProva {
                 tachoMaster.resetMovementMotorsPosition();
                 Floor.Direction d = floorMaster.changeBotDirection(newPosition);
 
-                Floor.TurnDirection turn = floorMaster.turnDirection(d);
+                Floor.TurnDirection turn = floorMaster.turnDirectionDispatch(d);
 
                 floorMaster.getFloor().setDestination(newPosition,true);
 
@@ -199,7 +201,7 @@ public class SecondaProva {
 
                 newPosition = botMoves.get(i);
                 Floor.Direction d = floorMaster.changeBotDirection(botMoves.get(i));
-                Floor.TurnDirection turn = floorMaster.turnDirection(d);
+                Floor.TurnDirection turn = floorMaster.turnDirectionDispatch(d);
 
                 //tachoMaster.turnBot(10,163,turn);
                 tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
@@ -246,16 +248,21 @@ public class SecondaProva {
 
         Floor.Direction prevD = floorMaster.getFloor().getBotDirection();
         Floor.Direction d = floorMaster.getFloor().safeDirection(floorMaster.floor.getStartPosition());
-        Floor.TurnDirection turn = floorMaster.turnDirection(d);
+        Floor.TurnDirection turn = floorMaster.turnDirectionDispatch(d);
         tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
+
+
+        tachoMaster.resetMovementMotorsPosition();
 
         tachoMaster.countAdjustment(15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
         tachoMaster.releaseMine(30,5000);
-       // tachoMaster.resetMovementMotorsPosition();
+        tachoMaster.resetMovementMotorsPosition();
         tachoMaster.countAdjustment(-15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
 
-        turn = floorMaster.turnDirection(prevD);
+        turn = floorMaster.turnDirectionDispatch(prevD);
         tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
 
     }
+
+    public static class N_ReachableException extends Exception{}
 }

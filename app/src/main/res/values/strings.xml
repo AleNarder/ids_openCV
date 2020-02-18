@@ -10,4 +10,11 @@
 
     </string-array>
 
+    <string-array name="system">
+
+        <item>X/Y</item>
+        <item>Y/X</item>
+
+    </string-array>
+
 </resources>

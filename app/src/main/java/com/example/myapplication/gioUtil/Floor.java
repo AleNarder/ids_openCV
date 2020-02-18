@@ -101,6 +101,8 @@ public class Floor {
 
     private List<Tile> uncheckedTileList;
 
+    private  Coordinate_System axisSystem;
+
     /************************/
 
     public Floor(int width , int height , float tileWidth , float tileHeight){
@@ -129,13 +131,13 @@ public class Floor {
 
     }
 
-    public Floor(int width , int height , float tileWidth , float tileHeight, int posX , int posY , Direction dir){
+    public Floor(int width , int height , float tileWidth , float tileHeight, int posX , int posY , Direction dir , Coordinate_System axisSystem){
         uncheckedTileList = new ArrayList<>();
-
         field = new Tile[width][height];
 
         this.width = width;
         this.height = height;
+        this.axisSystem = axisSystem;
 
         for(int i = 0 ; i<width ; i++)
             for(int j=0;j<height ; j++) {
@@ -155,13 +157,14 @@ public class Floor {
 
     }
 
-    public Floor(int width , int height , float tileWidth , float tileHeight, int posX , int posY , Direction dir , List<OnFloorPosition> l){
+    public Floor(int width , int height , float tileWidth , float tileHeight, int posX , int posY , Direction dir , List<OnFloorPosition> l , Coordinate_System axisSystem){
         uncheckedTileList = new ArrayList<>();
 
         field = new Tile[width][height];
 
         this.width = width;
         this.height = height;
+        this.axisSystem = axisSystem;
 
         for(int i = 0 ; i<width ; i++)
             for(int j=0;j<height ; j++) {
@@ -227,6 +230,7 @@ public class Floor {
         return null;
     }
     public BotDirection getBot(){return botDirection;}
+    public Coordinate_System getAxisSystem(){return axisSystem;}
     public OnFloorPosition getActualPosition() {
         return actualPosition;
     }
@@ -447,6 +451,11 @@ public class Floor {
         VERTICAL_DOWN
 
 
+    }
+
+    public enum Coordinate_System{
+        CARTESIAN,
+        MATRIX
     }
 
 

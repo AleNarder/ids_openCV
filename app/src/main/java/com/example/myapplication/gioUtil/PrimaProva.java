@@ -107,7 +107,7 @@ public class PrimaProva {
 
                 Floor.Direction d = floorMaster.changeBotDirection(newPosition);
 
-                Floor.TurnDirection turn = floorMaster.turnDirection(d);
+                Floor.TurnDirection turn = floorMaster.turnDirectionDispatch(d);
 
 
                 //tachoMaster.turnBot(10, 163, turn);
@@ -204,7 +204,7 @@ public class PrimaProva {
                 }
 
                 Floor.Direction d = floorMaster.changeBotDirection(newPosition);
-                Floor.TurnDirection turn = floorMaster.turnDirection(d);
+                Floor.TurnDirection turn = floorMaster.turnDirectionDispatch(d);
 
                 tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
 
@@ -251,15 +251,16 @@ public class PrimaProva {
 
         Floor.Direction prevD = floorMaster.getFloor().getBotDirection();
         Floor.Direction d = floorMaster.getFloor().safeDirection(floorMaster.floor.getStartPosition());
-        Floor.TurnDirection turn = floorMaster.turnDirection(d);
+        Floor.TurnDirection turn = floorMaster.turnDirectionDispatch(d);
         tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
 
+        tachoMaster.resetMovementMotorsPosition();
         tachoMaster.countAdjustment(15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
         tachoMaster.releaseMine(30,5000);
-        //tachoMaster.resetMovementMotorsPosition();
+        tachoMaster.resetMovementMotorsPosition();
         tachoMaster.countAdjustment(-15,Math.round(tachoMaster.getMotorsCount()),tileDim/2);
 
-        turn = floorMaster.turnDirection(prevD);
+        turn = floorMaster.turnDirectionDispatch(prevD);
         tachoMaster.turnBot(10,turn,sensorMaster,cameraListener.getInclination());
 
     }

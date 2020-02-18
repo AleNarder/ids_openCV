@@ -67,8 +67,9 @@ public class FirstTryActivity extends AppCompatActivity {
 
     private EditText et1, et2, et5, et6 , et7;
     private TextView tv3;
-    private Button startButtonFirst, stopButtonFirst;
+    private Button startButtonFirst;
     public Integer posX, posY;
+    public Floor.Coordinate_System axisSystem;
 
     MyCameraListener cameraListener;
 
@@ -101,7 +102,6 @@ public class FirstTryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_first_try);
 
         startButtonFirst = findViewById(R.id.startButtonFirst);
-        stopButtonFirst = findViewById(R.id.stopButtonFirst);
 
 
         et1 = findViewById(R.id.editText1);
@@ -152,7 +152,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
             Log.e("=============>", posX.toString()+" "+posY.toString()+" "+startDirection);
 
-            floor = new Floor(n,m , 30.0f, 30.0f, posX,posY,startDirection);
+            floor = new Floor(n,m , 30.0f, 30.0f, posX,posY,startDirection,axisSystem);
             setContentView(R.layout.activity_camera);
             mOpenCvCameraView = findViewById(R.id.OpenCvView);
             mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
@@ -168,7 +168,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
         });
 
-        stopButtonFirst.setOnClickListener(v -> ev3.cancel());
+
 
         Spinner spin = findViewById(R.id.spinner);
 
@@ -199,6 +199,32 @@ public class FirstTryActivity extends AppCompatActivity {
             }
         });
 
+        Spinner spin2 = findViewById(R.id.spinner2);
+
+        spin2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //Toast.makeText(FirstTryActivity.this,parent.getSelectedItem().toString(),Toast.LENGTH_SHORT).show();
+                String s = parent.getSelectedItem().toString();
+                switch(s){
+                    case "Y/X":
+                        //startDirection= Floor.Direction.VERTICAL_UP;
+                        axisSystem = Floor.Coordinate_System.CARTESIAN;
+                        break;
+                    case "X/Y":
+                        //startDirection= Floor.Direction.VERTICAL_DOWN;
+                        axisSystem = Floor.Coordinate_System.MATRIX;
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
     }
 
     /**************************************************************************************************************************/
@@ -220,7 +246,7 @@ public class FirstTryActivity extends AppCompatActivity {
         for (int i = 0; i < m; i++) {
             Button btn = new Button(this);
 
-            LinearLayout.LayoutParams b_params = new LinearLayout.LayoutParams(0, 100, 1);
+            LinearLayout.LayoutParams b_params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1);
             btn.setLayoutParams(b_params);
             ll2.addView(btn);
 
@@ -228,6 +254,7 @@ public class FirstTryActivity extends AppCompatActivity {
 
                 int x = l.get(j).getPosition().getRow();
                 int y = l.get(j).getPosition().getCol();
+                btn.setText(""+n+","+i);
                 String color = l.get(j).getColor();
                 if(color==null)
                     color="green";
@@ -307,6 +334,8 @@ public class FirstTryActivity extends AppCompatActivity {
         } catch (FloorMaster.AllPositionVisited allPositionVisited) {
             allPositionVisited.printStackTrace();
             Log.d("PRIMA PROVA : " , "Tutto il campo è stato visitato");
+            Toast.makeText(this, "Tutto il campo è stato visitato", Toast.LENGTH_SHORT).show();
+
         } finally {
             Prelude.trap(()->tachoMaster.stopMotors());
 
