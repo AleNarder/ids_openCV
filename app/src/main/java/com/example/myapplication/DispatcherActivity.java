@@ -18,6 +18,7 @@ public class DispatcherActivity extends AppCompatActivity {
 
         Button prova1Button = findViewById(R.id.prova1);
         Button prova2Button = findViewById(R.id.prova2);
+        Button prova3Button = findViewById(R.id.prova3);
 
         if (!OpenCVLoader.initDebug()) {
             Log.e("AndroidIngSwOpenCV", "Unable to load OpenCV");
@@ -27,9 +28,11 @@ public class DispatcherActivity extends AppCompatActivity {
 
         Intent prova1Intent   = new Intent(getBaseContext(), FirstTryActivity.class);
         Intent prova2Intent   = new Intent(getBaseContext(), SecondTryActivity.class);
+        Intent prova3Intent   = new Intent(getBaseContext(), ThirdTryActivity.class);
 
         prova1Button.setOnClickListener(v->startActivity(prova1Intent));
         prova2Button.setOnClickListener(v->startActivity(prova2Intent));
+        prova3Button.setOnClickListener(v->startActivity(prova3Intent));
 
     }
 }

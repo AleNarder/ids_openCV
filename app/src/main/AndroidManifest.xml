@@ -37,7 +37,7 @@
             android:name=".SecondTryActivity"
             android:screenOrientation="userLandscape" />
         <activity
-            android:name=".Nearby"
+            android:name=".MyNearby"
             android:screenOrientation="userLandscape" />
         <activity
             android:name=".FirstTryActivity"
